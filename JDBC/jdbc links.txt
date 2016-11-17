@@ -3,4 +3,4 @@ http://alvinalexander.com/java/java-mysql-select-query-example
 -------------------------------------------------------------------------
 If you use the Eclipse IDE
 http://cs.smith.edu/dftwiki/index.php/Tutorial:_Accessing_a_MySql_database_in_Java_(Eclipse)
-https://www.youtube.com/watch?v=2i4t-SL1VsU 
+https://www.youtube.com/watch?v=2i4t-SL1VsU
