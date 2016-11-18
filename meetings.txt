@@ -1,0 +1,22 @@
+Group Meetings
+========
+11/14/16
+Purpose: Setup Github/Slack/SourceTree.
+
+Members present: 
+- Daniel Banks
+- Justin Gelalia
+- Samuel Gost
+- David Hughes
+- Logan McManus
+
+========
+11/18/16
+Purpose: Worked on definitions, setup database jdbc connections/tables/queries.
+
+Members present:
+- Daniel Banks
+- Justin Gelalia
+- Samuel Gost
+- David Hughes
+- Logan McManus
