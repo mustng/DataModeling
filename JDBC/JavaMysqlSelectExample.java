@@ -19,7 +19,7 @@
             // create our mysql database connection
             String myDriver = "oracle.jdbc.driver.OracleDriver";
             Class.forName(myDriver);
-            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworc1", "hughesd@olympia", "n14425");
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworc1", "hughesd", "n14425");
             
             // our SQL SELECT query. 
             // if you only need a few columns, specify them by name instead of using "*"
