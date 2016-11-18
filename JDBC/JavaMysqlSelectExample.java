@@ -17,14 +17,13 @@
           try
           {
             // create our mysql database connection
-            String myDriver = "org.gjt.mm.mysql.Driver";
-            String myUrl = "jdbc:mysql://198.91.81.7:5432"; // jdbc:jtds:sqlserver:  198.91.81.7:1433
+            String myDriver = "oracle.jdbc.driver.OracleDriver";
             Class.forName(myDriver);
-            Connection conn = DriverManager.getConnection(myUrl, "davidte2_datamod", "ZTT#dJSNDuco");
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworc1", "hughesd@olympia", "n14425");
             
             // our SQL SELECT query. 
             // if you only need a few columns, specify them by name instead of using "*"
-            String query = "SELECT * FROM users";
+            String query = "SELECT faculty_number, last_name, first_name, address, gender, birth_date, area_of_expertise, salary FROM Faculty";
 
             // create the java statement
             Statement st = conn.createStatement();
@@ -35,15 +34,17 @@
             // iterate through the java resultset
             while (rs.next())
             {
-              int id = rs.getInt("id");
-              String firstName = rs.getString("first_name");
-              String lastName = rs.getString("last_name");
-              Date dateCreated = rs.getDate("date_created");
-              boolean isAdmin = rs.getBoolean("is_admin");
-              int numPoints = rs.getInt("num_points");
+              String faculty_number = rs.getString("faculty_number");
+              String last_name = rs.getString("last_name");
+              String first_name = rs.getString("first_name");
+              String address = rs.getString("address");
+              String gender = rs.getString("gender");
+              Date birth_date = rs.getDate("birth_date");
+              String area_of_expertise = rs.getString("area_of_expertise");
+              String salary = rs.getString("salary");
               
               // print the results
-              System.out.format("%s, %s, %s, %s, %s, %s\n", id, firstName, lastName, dateCreated, isAdmin, numPoints);
+              System.out.format("%s, %s, %s, %s, %s, %s, %s, %s\n",faculty_number, last_name, first_name, address, gender, birth_date, area_of_expertise, salary);
             }
             st.close();
           }
