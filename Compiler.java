@@ -1,6 +1,3 @@
-/*Nicholas Hecht completed Scanner, Parser, and User menu prompt */
-/*Samuel Ghost Andy Nguyen and Reiben Lucero completed semantics */
-/*Jonathan Phillipps completed the System Level commands and the DDL/DML commands along with the output of each queries, and modified all of the completed semantic code */
 //COP 4710
 //Final Project
 
@@ -9,9 +6,9 @@ import java.util.*;
 import java.io.*;
 import java.lang.*;
 import java.lang.String;
-import Language.*;
+//import Language.*;//16
 import java.util.ArrayList;
-import System.*;
+//import System.*;//16
 
 public class Compiler
 {
@@ -21,11 +18,11 @@ public class Compiler
     public static ArrayList<String> firstOperand = new ArrayList<String>();
     public static ArrayList<String> secondOperand = new ArrayList<String>();
     public static ArrayList<String> actions = new ArrayList<String>();
-    public static DatabaseManager databaseManager = new DatabaseManager("Databases/");
-    public static Database database = null;
-    public static DatabaseDataDefinitionManager databaseDataDefinitionManager = null;
-    public static DatabaseDataManipulationManager databaseDataManipulationManager = null;
-    public static DatabaseDataWManipulationManager databaseWDataManipulationManager = null;
+    //public static DatabaseManager databaseManager = new DatabaseManager("Databases/");//16
+    //public static Database database = null;//16
+    //public static DatabaseDataDefinitionManager databaseDataDefinitionManager = null;//16
+    //public static DatabaseDataManipulationManager databaseDataManipulationManager = null;//16
+    //public static DatabaseDataWManipulationManager databaseWDataManipulationManager = null;//16
 
 	public static final boolean DEBUG = true;
 	public static final boolean REPORT_ERROR = true;
@@ -48,6 +45,7 @@ public class Compiler
     public static String tableNameG  = "";
     public static String attributeNameG = "";
     public static String valueNameG = "";
+    public static int tempDistinct = 0;
 
     public static long total = 0;
 
@@ -56,7 +54,7 @@ public class Compiler
 
     {
 
-        databaseManager.init();
+        //databaseManager.init();//16
 
 
 
@@ -121,12 +119,14 @@ public class Compiler
 
         boolean value = true;                                                               //Flag to execute a user interactive menu
 
+
         while (value == true)
         {
             value = menu();
-            reset();
+            reset();//16
             debug("");
         }
+
 
     }
     public static boolean menu()
@@ -154,6 +154,7 @@ public class Compiler
         {
             scan();
             parse();
+
           
             return true;
         }
@@ -170,6 +171,7 @@ public class Compiler
         currToken.tok = "";
         currToken.type = "";
         index = 0;
+        tempDistinct = 0;
     }
 
     public static void scan()
@@ -188,11 +190,20 @@ public class Compiler
                 charFlag = true;
             }
 
-            else if (Character.isDigit(a))                                                                   //Check for a decimal inside a number or is a number
+            else if (Character.isDigit(a) || lineInput.charAt(i) == '.')                                                                   //Check for a decimal inside a number or is a number
             {
                 num += a;
                 numFlag = true;
             }
+
+
+            /*
+            else if (lineInput.charAt(i) == '.'){
+                String temp = "";
+                Token theToken = new Token("SYMBOL", temp);
+                tokenList.add(theToken);
+            }
+            */
 
             else if (tokens.contains(token))
             {
@@ -203,6 +214,8 @@ public class Compiler
                     a = lineInput.charAt(++i);                                                                  //store the token as a string
                     temp += a;
                 }
+
+
 
                 else
                     temp += a;                                                                                  //Cast to string and store in the array list
@@ -279,6 +292,13 @@ public class Compiler
 
     }
 
+    public static void failed(String expected, String current){
+        debug("");
+        debug(" [ERROR] EXPECTED THE TOKEN OR TOKEN TYPE: " + expected);
+        debug("USER INPUT: " + current);
+        errorFlag = true;
+    }
+
     public static void CheckToken(String expected, String current)                                                      //Function to check whether the current token is correct
     {
         if (Objects.equals(expected, current))
@@ -286,6 +306,7 @@ public class Compiler
             //debug("ACCEPTED: " + current);
             index++;
             currToken = tokenList.get(index);
+            System.out.println(current);
         }
 
         else if (errorFlag == false && (!Objects.equals(currToken.tok, ";") || createTabFlag == true))
@@ -312,7 +333,7 @@ public class Compiler
  	        debug("");
             debug("ACCEPT");
             index = 0;
-            semantics();
+            //semantics();
         }
 
         else                                                                                                            //Else reject
@@ -413,7 +434,16 @@ public class Compiler
         else if (Objects.equals(currToken.tok, "SELECT"))
         {
             CheckToken("SELECT", currToken.tok);
+
+            //int next = index + 1;
             selectCommand();
+            /*
+            if(Objects.equals(currToken.tok, "*")) {
+                selectCommand();
+            }else if(Objects.equals(currToken.type, "ID")){
+                selectCommandNotAll();
+            }
+            */
         }
 
         else if (Objects.equals(currToken.tok, "WSELECT"))
@@ -595,9 +625,92 @@ public class Compiler
     public static void selectCommand()
     {
         //We have seen select and now we accept *
-        CheckToken("*", currToken.tok);
+
+        //CheckToken("*", currToken.tok);
+        //CheckToken("FROM", currToken.tok);
+        //CheckToken("ID", currToken.type);
+
+
+        if (Objects.equals(currToken.tok, "*"))
+        {
+            CheckToken("*", currToken.tok);
+            if(Objects.equals(currToken.tok, "FROM")) {
+                CheckToken("FROM", currToken.tok);
+                fromKeyWord();
+            }
+            //CheckToken("FROM", currToken.tok);
+            //CheckToken("ID", currToken.type);
+            wSelectCommand3();
+        }
+        else if(Objects.equals(currToken.tok, "DISTINCT") && tempDistinct == 0){
+            CheckToken("DISTINCT", currToken.tok);
+            if(Objects.equals(currToken.type, "ID")){
+                CheckToken("ID", currToken.type);
+                fieldList();
+            }
+            else
+                System.out.print("Error #12a: there must be an attribute(s) after the word DISTINCT");
+
+            tempDistinct++;
+        }
+
+        else if(Objects.equals(currToken.type, "ID"))
+        {
+
+            CheckToken("ID", currToken.type);
+            fieldList();
+            //CheckToken("FROM", currToken.tok);
+            //CheckToken("ID", currToken.type);
+            //wSelectCommand3();
+        }
+
+    }
+    public static void idFound(){
+        if(Objects.equals(currToken.type, "ID"))
+        {
+
+            CheckToken("ID", currToken.type);
+            fieldList();
+            //CheckToken("FROM", currToken.tok);
+            //CheckToken("ID", currToken.type);
+            //wSelectCommand3();
+        }
+    }
+
+    public static void fromKeyWord(){
+        //if(Objects.equals(currToken.tok, "FROM"))
+        //{
+            //CheckToken("FROM", currToken.tok);
+            if(Objects.equals(currToken.type, "ID")){
+                CheckToken("ID", currToken.type);
+                if(Objects.equals(currToken.tok, "WHERE")){
+                    wSelectCommand3();
+                }
+                else if(Objects.equals(currToken.tok, ","))
+                {
+                    CheckToken(",", currToken.tok);
+                    fromKeyWord();
+                }
+                else if(Objects.equals(currToken.tok, ";"))
+                {
+
+                }
+                else
+                    System.out.print("missing a WHERE clause, more tables or a semicolon");
+            }
+            else
+                failed("ID", currToken.type);
+        //}
+    }
+
+    public static void selectCommandNotAll()
+    {
+        //We have seen select and now we accept ID
+
+        CheckToken("ID", currToken.type);
         CheckToken("FROM", currToken.tok);
         CheckToken("ID", currToken.type);
+
     }
 
     public static void wSelectCommand()
@@ -605,6 +718,7 @@ public class Compiler
         //We have already accepted wSelect, call command2 for the rest of the tokens
         wSelectCommand2();
     }
+
 
     public static void wSelectCommand2()
     {
@@ -628,13 +742,25 @@ public class Compiler
         }
     }
 
+
     public static void wSelectCommand3()
     {
         //If we see keyword where then accept and call condition
         if (Objects.equals(currToken.tok, "WHERE"))
         {
             CheckToken("WHERE", currToken.tok);
-            condition();
+            if(Objects.equals(currToken.type, "ID")) {
+                CheckToken("ID", currToken.type);
+                expression();
+            }
+            else
+                System.out.print("Error #9a: There must be an attribute after the WHERE key word!");
+
+        } else if (Objects.equals(currToken.tok, ";")){
+
+        }
+        else{
+            failed("WHERE", currToken.tok);
         }
         //If not fall out the bottom
     }
@@ -642,10 +768,13 @@ public class Compiler
     public static void fieldDefList()
     {
         //Check for ID then the type of ID
+
         CheckToken("ID", currToken.type);
+
         fieldType();
         if (Objects.equals(currToken.tok, ","))
         {
+
             CheckToken(",", currToken.tok);
             fieldDefList();
         }
@@ -704,12 +833,55 @@ public class Compiler
         }
     }
 
-    public static void fieldList()
-    {
+    public static void dotAttribute(){
         if (Objects.equals(currToken.type, "NUM"))
         {
-            CheckToken("NUM", currToken.type);
+            CheckToken(".", currToken.tok);
+            if(Objects.equals(currToken.type, "ID")){
+                CheckToken("ID", currToken.type);
+                if(Objects.equals(currToken.type, "NUM"))
+                    failed("NUM", currToken.type);
+            }
+            else {
+                failed("ID", currToken.type);
+            }
         }
+    }
+
+    public static void fieldList()
+    {
+        //CheckToken(",", currToken.tok);
+        if (Objects.equals(currToken.tok, "AS"))
+        {
+            asStatment();
+        }
+        else if (Objects.equals(currToken.tok, ","))
+        {
+            CheckToken(",", currToken.tok);
+            if(Objects.equals(currToken.type, "ID"))
+            {
+                CheckToken("ID", currToken.type);
+                fieldList();
+            }
+            else if(Objects.equals(currToken.tok, "<")){
+                definitionThree();
+            }
+            else
+                System.out.print("Error #14a: missing an attribute or an opening angle bracket!");
+        }
+        else if(Objects.equals(currToken.tok, "FROM")){
+            CheckToken("FROM", currToken.tok);
+            fromKeyWord();
+        }
+        else if(Objects.equals(currToken.type, "NUM")){
+
+            dotAttribute();
+            fieldList();
+        }
+        else{
+            System.out.print("Error # 6a: missing a FROM, a comma, a dot or an AS");
+        }
+        /*
         else if (Objects.equals(currToken.tok, "'"))
         {
             CheckToken("'", currToken.tok);                                                 //Accept ' and do more checks
@@ -756,12 +928,142 @@ public class Compiler
             }
             CheckToken("'", currToken.tok);
         }
-        if (Objects.equals(currToken.tok, ","))
+        */
+
+    }
+
+    public static void definitionThree_fieldList()
+    {
+        if (Objects.equals(currToken.tok, "AS"))
+        {
+            definitionThree_asStatment();
+        }
+        else if (Objects.equals(currToken.tok, ","))
         {
             CheckToken(",", currToken.tok);
-            fieldList();
+            if(Objects.equals(currToken.type, "ID"))
+            {
+                CheckToken("ID", currToken.type);
+                definitionThree_fieldList();
+            }
+            else if(Objects.equals(currToken.tok, "<")){
+                definitionThree();
+            }
+            else if(Objects.equals(currToken.tok, ">"))
+                definitionThree_closing();
+        }
+        else if(Objects.equals(currToken.type, "NUM"))
+        {
+            dotAttribute();
+            definitionThree_fieldList();
+        }
+        else{
+            System.out.print("Error # 6a: missing a FROM, a comma, a dot or an AS");
         }
     }
+
+    public static void definitionThree_closing(){
+        if(Objects.equals(currToken.tok, ">")){
+            CheckToken(">", currToken.tok);
+            if(Objects.equals(currToken.tok, ",")){
+                CheckToken(",", currToken.tok);
+                if(Objects.equals(currToken.tok, "FROM")){
+                    CheckToken("FROM", currToken.tok);
+                    fromKeyWord();
+                }
+                else if(Objects.equals(currToken.tok, ">")){
+                    definitionThree_closing();
+                }
+                else
+                    System.out.print("Error #13a: missing a FROM keyword or a closed angle bracket!");
+            }
+            else
+                failed(",", currToken.tok);
+        }
+        else
+            System.out.print("Error #12a: missing either an attribute, an open angle bracket, or an closed angle bracket! ");
+    }
+
+    public static void definitionThree(){
+        if(Objects.equals(currToken.tok, "<")){
+            CheckToken("<", currToken.tok);
+            if(Objects.equals(currToken.type, "ID")){
+                definitionThree_withoutCompression();
+            }
+            else if(Objects.equals(currToken.tok, "+")){
+                CheckToken("+", currToken.tok);
+                definitionThree_withoutCompression();
+            }
+            else
+            {
+                System.out.print("Error #15a: missing the Compression Name or the Compression sign!");
+            }
+        }
+        else {
+            failed("<", currToken.tok);
+        }
+    }
+
+    public static void definitionThree_withoutCompression(){
+        if(Objects.equals(currToken.type, "ID")){
+            //TaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaagNames!
+            CheckToken("ID", currToken.type);
+            if(Objects.equals(currToken.tok, ",")){
+                CheckToken(",", currToken.tok);
+                if(Objects.equals(currToken.type, "ID")){
+                    CheckToken("ID", currToken.type);
+                    definitionThree_fieldList();
+                }
+                else
+                {
+                    failed("ID", currToken.type);
+                }
+            }
+            else
+            {
+                failed(",", currToken.tok);
+            }
+        }
+        else
+        {
+            failed("ID", currToken.type);
+        }
+    }
+
+    public static void asStatment(){
+        if (Objects.equals(currToken.tok, "AS"))
+        {
+            CheckToken("AS", currToken.tok);
+            if(Objects.equals(currToken.type, "ID")){
+                CheckToken("ID", currToken.type);
+                if(Objects.equals(currToken.tok, ","))
+                    fieldList();
+                else
+                    failed(",", currToken.tok);
+            }
+            else
+                failed("ID", currToken.type);
+        }
+    }
+
+    public static void definitionThree_asStatment(){
+        if (Objects.equals(currToken.tok, "AS"))
+        {
+            CheckToken("AS", currToken.tok);
+            if(Objects.equals(currToken.type, "ID")){
+                CheckToken("ID", currToken.type);
+                if(Objects.equals(currToken.tok, ","))
+                    definitionThree_fieldList();
+                else
+                    failed(",", currToken.tok);
+            }
+            else
+                failed("ID", currToken.type);
+        }
+    }
+
+
+
     public static void literal()
     {
         //Must see an ID or a NUM
@@ -827,20 +1129,35 @@ public class Compiler
     public static void condition()
     {
         //Checks for attribute and then expression
-        CheckToken("ID", currToken.type);
-        compare();
-        expression();
+        if (Objects.equals(currToken.type, "ID"))
+        {
+            CheckToken("ID", currToken.tok);
+            //compare();
+            expression();
+        }
+        else if(Objects.equals(currToken.type, "NUM")){
+            dotAttribute();
+            expression();
+        }
+        else{
+            failed("ID", currToken.tok);
+        }
+        //CheckToken("ID", currToken.type);
+        //compare();
+        //expression();
     }
 
     public static void compare()
     {
         if (operator.contains(currToken.tok))
             CheckToken("SYMBOL", currToken.type);
+        else
+            failed("SYMBOL", currToken.type);
     }
 
-    public static void expression()                                                                                     //Expression supports ID = ID or ID = NUM
+    public static void expression()//????????????????????????????????????                                                                                     //Expression supports ID = ID or ID = NUM
     {                                                                                                                   //Or ID = ID + ID (concatenate strings)
-        if (Objects.equals(currToken.type, "NUM") && Objects.equals(tokenList.get(index+1).tok, "+"))                   //or ID = NUM + NUM (add values to existing values)
+        /*if (Objects.equals(currToken.type, "NUM") && Objects.equals(tokenList.get(index+1).tok, "+"))                   //or ID = NUM + NUM (add values to existing values)
         {
             CheckToken("NUM", currToken.type);
             while(Objects.equals(currToken.tok, "+"))
@@ -850,16 +1167,59 @@ public class Compiler
             }
         }
 
-        else if (Objects.equals(currToken.type, "ID") && Objects.equals(tokenList.get(index+1).tok, "+"))
-        {
-            CheckToken("ID", currToken.type);
+        else */
+        //if (Objects.equals(currToken.type, "ID") )
+        //{
+            //CheckToken("ID", currToken.type);
+
+            if(Objects.equals(currToken.tok, "=")) {
+                CheckToken("=", currToken.tok);
+                afterOperator();
+            }
+            else if(Objects.equals(currToken.tok, "<>")) {
+                CheckToken("<>", currToken.tok);
+                afterOperator();
+            }
+            else if(Objects.equals(currToken.tok, "<")) {
+                CheckToken("<", currToken.tok);
+                afterOperator();
+            }
+            else if(Objects.equals(currToken.tok, ">")) {
+                CheckToken(">", currToken.tok);
+                afterOperator();
+            }
+            else if(Objects.equals(currToken.tok, ">=")) {
+                CheckToken(">=", currToken.tok);
+                afterOperator();
+            }
+            else if(Objects.equals(currToken.tok, "<=")) {
+                CheckToken("<=", currToken.tok);
+                afterOperator();
+            }
+            else if(Objects.equals(currToken.type, "NUM")){
+                dotAttribute();
+                expression();
+            }
+            /*else if(Objects.equals(currToken.tok, "BETWEEN")) {
+                CheckToken("BETWEEN", currToken.tok);
+                inQuotes();
+            }*/
+            else
+                System.out.print("Error #7a: missing an operator like = or < or > or <= or >= or a continuation of the attribute!");
+
+
+
+
+        /*
             while(Objects.equals(currToken.tok, "+"))
             {
                 CheckToken("+", currToken.tok);
                 CheckToken("ID", currToken.type);
             }
-        }
+        */
+        //}
 
+    /*
         else if (Objects.equals(currToken.type, "ID"))
         {
             CheckToken("ID", currToken.type);
@@ -869,8 +1229,70 @@ public class Compiler
         {
             CheckToken("NUM", currToken.type);
         }
+        */
     }
 
+    public static void afterOperator() {
+        if (Objects.equals(currToken.tok, "'")){
+            inQuotes();
+            andContinuation();
+        }
+        else if(Objects.equals(currToken.type, "NUM")) {
+            CheckToken("NUM", currToken.type);
+            if (Objects.equals(currToken.tok, "AND")){
+                andContinuation();
+            }
+            else if(Objects.equals(currToken.tok, ";")){
+
+            }
+            else{
+                System.out.print("Error #8a: missing the AND keyword or the semicolon!");
+            }
+        }
+        else
+            System.out.print("Error #9a: next token should be a String or a number!");
+    }
+
+    public static void inQuotes(){
+        if(Objects.equals(currToken.tok, "'")){
+            CheckToken("'", currToken.tok);
+            if(Objects.equals(currToken.type, "ID")){
+                CheckToken("ID", currToken.type);
+                if(Objects.equals(currToken.tok, "'"))
+                    CheckToken("'", currToken.tok);
+                else if(Objects.equals(currToken.type, "NUM")){
+                    dotAttribute();
+                    CheckToken("'", currToken.tok);
+                }
+                else
+                    System.out.print("Error #11a: missing either the closed quote or attribute continuation");
+            }
+            else{
+                failed("ID", currToken.type);
+            }
+
+        }else
+            failed("", currToken.tok);
+
+
+    }
+
+    public static void andContinuation(){
+        if (Objects.equals(currToken.tok, "AND")){
+            CheckToken("AND", currToken.tok);
+            if (Objects.equals(currToken.type, "ID")) {
+                CheckToken("ID", currToken.type);
+                expression();
+            } else
+                System.out.print("Error #10a: missing the attribute!");
+        }
+        else if(Objects.equals(currToken.tok, ";")){
+
+        }
+        else{
+            System.out.print("Error #8a: missing the AND keyword or the semicolon!");
+        }
+    }
 
 
 	/********************************************************************************/
@@ -896,11 +1318,13 @@ public class Compiler
         }
 		
 		debug("^^^ 2loopUntilNoMoreAttributes*");
+        /*16
         if (database.table(table_name) == null || database.table(table_name).get_attribute(tokenList.get(count).tok) == null) {
         	report_error(count, "CODE: 10 [ERROR] This attribute doesn't exist.");
         	return;
         }
-		
+		*/
+
         attributes.add(tokenList.get(count).tok);
 		
         count ++;
@@ -943,7 +1367,7 @@ public class Compiler
             debug("ACCEPT!");
             debug("The field attributes are: " +attributes);
             debug("The field attribute types are: " +attributeTypes);
-            databaseDataDefinitionManager.create_table(table_name, attributes, attributeTypes);
+            //databaseDataDefinitionManager.create_table(table_name, attributes, attributeTypes);//16
             reset_global_storage();
         }
     }
@@ -1338,11 +1762,12 @@ public class Compiler
         	
             count++;
             debug("^^^ 10commandList: "+tokenList.get(count).tok);
+            /*16
             if (database.table(tableNameG).get_attribute(tokenList.get(count).tok) == null) {
             	report_error(count, "CODE: 12 [ERROR] This attribute name doesn't exist.");
                 return -1;
             }
-			
+			*/
 			attributeNameG = tokenList.get(count).tok;
 			
             count++;
@@ -1369,15 +1794,17 @@ public class Compiler
             debug("The second operand is: " +secondOperand);
             debug("Attributes: "+attributes);
             debug("TIME: "+total);
-            databaseWDataManipulationManager.table_wupdate(tableNameG, attributes, firstOperand, actions, secondOperand,attributeNameG, valueNameG, total);
+            //16
+            //databaseWDataManipulationManager.table_wupdate(tableNameG, attributes, firstOperand, actions, secondOperand,attributeNameG, valueNameG, total);//16
             reset_global_storage();
    		}
         else if (Objects.equals("ID", tokenList.get(count).type)) {
+            /*16
         	if (database.table(tableNameG).get_attribute(tokenList.get(count).tok) == null) {
         		report_error(count, "CODE: 11-2 [ERROR] This attribute name doesn't exist.");
         		return -1;
         	}
-        	
+        	*/
 			count++;
             fieldName_expression(count);
     	}
@@ -1407,11 +1834,12 @@ public class Compiler
 
     public static void fieldName_expression(int count) {
         debug("^^^ 1fieldName_expression: "+tokenList.get(count).tok);
+        /*16
         if (database.table(tableNameG).get_attribute(tokenList.get(count).tok) == null) {
         	report_error(count, "CODE: 11 [ERROR] the attribute does not exist.");
         	return;
         }
-		
+		*/
 		attributes.add(tokenList.get(count).tok);
 		
         count++;
@@ -1454,18 +1882,19 @@ public class Compiler
             debug("The second operands are: " +secondOperand);
             debug("Attributes: "+attributes);
             debug("TIME: "+total);
-            
-            databaseWDataManipulationManager.table_wupdate(tableNameG, attributes, firstOperand, actions, secondOperand, total);
+            //16
+            //databaseWDataManipulationManager.table_wupdate(tableNameG, attributes, firstOperand, actions, secondOperand, total);//16
 			reset_global_storage();
         }
         else if (isWhere) {
             count++;
             debug("^^^ 5fieldName_expression: "+tokenList.get(count).tok);
+            /*16
             if (database.table(tableNameG).get_attribute(tokenList.get(count).tok) == null) {
             	report_error(count, "CODE: 7 [ERROR] This attribute name doesn't exist.");
             	return;
             }
-			
+			*/
 			count++;
              if (!Objects.equals(tokenList.get(count).tok, "<") && !Objects.equals(tokenList.get(count).tok, ">") && !Objects.equals(tokenList.get(count).tok, "<>") && !Objects.equals(tokenList.get(count).tok, "<=") && !Objects.equals(tokenList.get(count).tok, ">=") && !Objects.equals(tokenList.get(count).tok, "=")) {
                	report_error(count, "CODE: 6 [ERROR] missing an operator.");
@@ -1483,7 +1912,8 @@ public class Compiler
             debug("The first operands are: " +firstOperand);
             debug("The operators are: " +actions);
             debug("The second operands are: " +secondOperand);
-            databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions, secondOperand, attributeNameG,valueNameG);
+            //16
+            //databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions, secondOperand, attributeNameG,valueNameG);//16
             reset_global_storage();
         }
         index = count;
@@ -1492,12 +1922,13 @@ public class Compiler
     public static void fields(int count) {
         debug("^^^ 1fields: "+tokenList.get(count).tok);
 
+        /*16
         if (database.table(tableNameG).get_attribute(tokenList.get(count).tok) == null) {
         	report_error(count, "CODE: 3 [ERROR] the attribute does not exist.");
         	index = count;
         	return;
         }
-		
+		*/
         count++;
         debug("^^^ 2fields: "+tokenList.get(count).tok);
         if (Objects.equals(tokenList.get(count).tok, ","))
@@ -1509,13 +1940,13 @@ public class Compiler
     public static int fieldsInsert(int count) {
         debug("^^^ 1fieldInsert: "+tokenList.get(count).tok);
         int countFields = 0;
-        
+        /*16
         if (database.table(tableNameG).get_attribute(tokenList.get(count).tok) == null) {
         	 report_error(count, "CODE: 3 [ERROR] the attribute does not exist.");
         	 index = count;
         	 return countFields;
         }
-        
+        */
         attributes.add(tokenList.get(count).tok);
 
         countFields++;
@@ -1590,7 +2021,8 @@ public class Compiler
             debug("ACCEPT!");
             debug("The field attributes are: " +attributes);
             debug("The field attribute types are: " +attributeTypes);
-            databaseDataDefinitionManager.create_table(table_name, attributes, attributeTypes);
+            //16
+            //databaseDataDefinitionManager.create_table(table_name, attributes, attributeTypes);//16
             reset_global_storage();
         }
         
@@ -1609,7 +2041,8 @@ public class Compiler
             debug("CODE: ACCEPT!");
             debug("The field attributes are: " +attributes);
             debug("The field attribute types are: " +attributeTypes);
-            databaseDataDefinitionManager.create_table(table_name, attributes, attributeTypes);
+            //16
+            //databaseDataDefinitionManager.create_table(table_name, attributes, attributeTypes);//16
             reset_global_storage();
         }
 
@@ -1651,789 +2084,800 @@ public class Compiler
 	
     public static void semantics() {
     	debug(tokenList.get(index).tok);
-		String kWord = "";
-		
-        switch (tokenList.get(index).tok) {
-            case "CREATE":
+		//String kWord = "";
+        //String create = "CREATE";
+
+        String s = tokenList.get(index).tok;
+        /*
+        if (s.equals("CREATE")) {
+            index++;
+
+            boolean createTable = Objects.equals(tokenList.get(index).tok, "TABLE");
+            boolean createDatabase = Objects.equals(tokenList.get(index).tok, "TABLE");
+
+            if (!createTable && !createDatabase) {
+                report_error("CODE: 8 [ERROR] This should be the key word TABLE or DATABASE after CREATE.");
+                //break;//16
+            }
+
+            if (createTable) {
                 index++;
-                
-                boolean createTable = Objects.equals(tokenList.get(index).tok, "TABLE");
-                boolean createDatabase = Objects.equals(tokenList.get(index).tok, "TABLE");
-                
-                if (!createTable && !createDatabase) {
-                	report_error("CODE: 8 [ERROR] This should be the key word TABLE or DATABASE after CREATE.");
-                	break;
-                }
-                
-                if (createTable) {
-                    index ++;
-                    debug(tokenList.get(index).tok);
+                debug(tokenList.get(index).tok);
+                */
+                    /*16
                     if (database.table(tokenList.get(index).tok) != null) {
                     	report_error("CODE: 4 [ERROR] this table name already exists.");
                     	break;
                     }
-                    
-                    tableNameG = tokenList.get(index).tok;
-					
-                    index ++;
-                    if (!Objects.equals(tokenList.get(index).tok, "(")) {
-                    	report_error("CODE: 3 [ERROR] missing a closed paren.");
-                    	break;
-                    }
-					
-                    index++;
-                    debug(tokenList.get(index).tok);
-                    if (!Objects.equals("ID", tokenList.get(index).type))
-                    	break;
-                    
-                    attributes.add(tokenList.get(index).tok);
+                    */
+        /*
+                tableNameG = tokenList.get(index).tok;
 
-     				index++;
-
-                    if (!Objects.equals(tokenList.get(index).tok, "INTEGER") && !Objects.equals(tokenList.get(index).tok, "NUMBER") && !Objects.equals(tokenList.get(index).tok, "CHARACTER") && !Objects.equals(tokenList.get(index).tok, "DATE")) {
-                    	report_error("CODE: 2 [ERROR] This should be a keyword.");
-                    	break;
-                    }
-										
-                    attributeTypes.add(tokenList.get(index).tok);
-					debug(tokenList.get(index).tok);
-					
-					if (Objects.equals(tokenList.get(index).tok, "INTEGER")) {
-						index++;
-                        dataTypeColumnSpec(index, "integer", tableNameG);
-                    }
-                    else if (Objects.equals(tokenList.get(index).tok, "NUMBER")) {
-						index++;
-                       	dataTypeColumnSpec(index, "number", tableNameG);
-                    }
-                    else if (Objects.equals(tokenList.get(index).tok, "CHARACTER")) {
-						index++;
-                        dataTypeColumnSpec(index, "char", tableNameG);
-                    } 
-                    else if (Objects.equals(tokenList.get(index).tok, "DATE")) {
-						index++;
-                       	dataTypeColumnSpec(index, "date", tableNameG);
-                   	}        
+                index++;
+                if (!Objects.equals(tokenList.get(index).tok, "(")) {
+                    report_error("CODE: 3 [ERROR] missing a closed paren.");
+                    //break;//16
                 }
 
-                else if (createDatabase) {
-                    index ++;
+                index++;
+                debug(tokenList.get(index).tok);
+                if (!Objects.equals("ID", tokenList.get(index).type))
+                    //break;//16
+
+                attributes.add(tokenList.get(index).tok);
+
+                index++;
+
+                if (!Objects.equals(tokenList.get(index).tok, "INTEGER") && !Objects.equals(tokenList.get(index).tok, "NUMBER") && !Objects.equals(tokenList.get(index).tok, "CHARACTER") && !Objects.equals(tokenList.get(index).tok, "DATE")) {
+                    report_error("CODE: 2 [ERROR] This should be a keyword.");
+                    //break;//16;
+                }
+
+                attributeTypes.add(tokenList.get(index).tok);
+                debug(tokenList.get(index).tok);
+
+                if (Objects.equals(tokenList.get(index).tok, "INTEGER")) {
+                    index++;
+                    dataTypeColumnSpec(index, "integer", tableNameG);
+                } else if (Objects.equals(tokenList.get(index).tok, "NUMBER")) {
+                    index++;
+                    dataTypeColumnSpec(index, "number", tableNameG);
+                } else if (Objects.equals(tokenList.get(index).tok, "CHARACTER")) {
+                    index++;
+                    dataTypeColumnSpec(index, "char", tableNameG);
+                } else if (Objects.equals(tokenList.get(index).tok, "DATE")) {
+                    index++;
+                    dataTypeColumnSpec(index, "date", tableNameG);
+                }
+            } else if (createDatabase) {
+                index++;
+    */
+                    /*16
                     if (databaseManager.database_exists(tokenList.get(index).tok)) {
                        report_error("CODE: 5 [ERROR] The Database name already exists.");
                        break;
                     }
-                    
-                    index++;
-                    debug("^^^ 6commandList: "+tokenList.get(index).tok);
-                    if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                    	report_error("CODE: 7 [ERROR] This should be a semicolon and end of statment.");
-                    	break;
-                    }
-                	
+                    */
+        /*
+                index++;
+                debug("^^^ 6commandList: " + tokenList.get(index).tok);
+                if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                    report_error("CODE: 7 [ERROR] This should be a semicolon and end of statment.");
+                    //break;//16;
+                }
+        */
+                	/*16
                 	database = databaseManager.get_database(tokenList.get(index-1).tok);
                     databaseDataDefinitionManager = new DatabaseDataDefinitionManager(database);
                     databaseDataManipulationManager = new DatabaseDataManipulationManager(database);
                     databaseWDataManipulationManager = new DatabaseDataWManipulationManager(database);
-                }
-                break;
-			
-            case "DROP":
-                index++;
-                debug("^^^ 9commandList: "+tokenList.get(index).tok);
-                
-                boolean dropTable = Objects.equals(tokenList.get(index).tok, "TABLE");
-                boolean dropDatabase = Objects.equals(tokenList.get(index).tok, "TABLE");
+                    */
+        /*
+            }
 
-                
-                if (!dropTable && !dropDatabase) {
-                	report_error("CODE: 16 [ERROR] This should be the key word TABLE or DATABASE after DROP.");
-                	break;
-                }
-                
-                if (dropTable) {
-                    index++;
-                    debug("^^^ 10commandList: "+tokenList.get(index).tok);
+        } else*/ /* if (s.equals("DROP")) {
+            index++;
+            debug("^^^ 9commandList: " + tokenList.get(index).tok);
+
+            boolean dropTable = Objects.equals(tokenList.get(index).tok, "TABLE");
+            boolean dropDatabase = Objects.equals(tokenList.get(index).tok, "TABLE");
+
+
+            if (!dropTable && !dropDatabase) {
+                report_error("CODE: 16 [ERROR] This should be the key word TABLE or DATABASE after DROP.");
+                //break;//16;
+            }
+
+            if (dropTable) {
+                index++;
+                debug("^^^ 10commandList: " + tokenList.get(index).tok);
+                */
+                    /*16
                     if (database.table(tokenList.get(index).tok) == null) {
                     	report_error("CODE: 12 [ERROR] this table name does not exists.");
                     	break;
                     }
-                    
-                    tableNameG = tokenList.get(index).tok;
+                    */
+        /*
+                tableNameG = tokenList.get(index).tok;
 
-                    index++;
-                    debug("^^^ 11commandList: "+tokenList.get(index).tok);
-                    if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                        report_error("CODE:  [ERROR] looking for semicolon.");
-                        break;
-                    }
-                    
-                    debug("ACCEPT");
-                    databaseDataDefinitionManager.drop_table(tableNameG);
+                index++;
+                debug("^^^ 11commandList: " + tokenList.get(index).tok);
+                if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                    report_error("CODE:  [ERROR] looking for semicolon.");
+                    //break;//16;
                 }
-                
-                else if (dropDatabase) {
-                    index ++;
+
+                debug("ACCEPT");
+
+                //databaseDataDefinitionManager.drop_table(tableNameG);//16
+            } else if (dropDatabase) {
+                index++;
+            */
+                    /*16
                     if (!databaseManager.database_exists(tokenList.get(index).tok)) {
                        report_error("CODE: 13 [ERROR] The Database name already exists.");
                        break;
                     }
-                    
-                    index++;
-                    debug("^^^ 14commandList: "+tokenList.get(index).tok);
-                    if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                    	report_error("CODE: 15 [ERROR] This should be a semicolon and end of statment.");
-                    	break;
-                    }
-                    
-                    debug("ACCEPT");
-                	databaseManager.drop_database(database.name());
-                	database = null;
-                }
-                break;
-
-            case "SELECT":
-
-                boolean selectDatabase = Objects.equals(tokenList.get(index).tok, "TABLE");
-
-				index++;
-                debug("^^^ 17commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, "*")) {
-                	report_error("CODE: 23 [ERROR] Where is the star * ");
-                	break;
-                }
-
+                    */
+        /*
                 index++;
-                debug("^^^ 18commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, "FROM")) {
-                	report_error("CODE: 22 [ERROR] There should be a FROM key word. ");
-                	break;
+                debug("^^^ 14commandList: " + tokenList.get(index).tok);
+                if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                    report_error("CODE: 15 [ERROR] This should be a semicolon and end of statment.");
+                    //break;//16;
                 }
-				
-                index++;
-                debug("^^^ 19commandList: "+tokenList.get(index).tok);
-                try {
+
+                debug("ACCEPT");
+
+                //databaseManager.drop_database(database.name());//16
+                //database = null;//16
+            }
+
+        } else*/ if (s.equals("SELECT")) {
+            boolean selectDatabase = Objects.equals(tokenList.get(index).tok, "TABLE");
+
+            index++;
+            debug("^^^ 17commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "*")) {
+                //report_error("CODE: 23 [ERROR] Where is the * or the ID ");//16
+                //break;//16;
+            }
+
+            index++;
+            debug("^^^ 18commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "FROM")) {
+                report_error("CODE: 22 [ERROR] There should be a FROM key word. ");
+                //break;//16;
+            }
+
+            index++;
+            debug("^^^ 19commandList: " + tokenList.get(index).tok);
+            try {
+                    /*16
                 	if (database.table(tokenList.get(index).tok) == null) {
                 		report_error("CODE: 21 [ERROR] this table name does not exists.");
                 		break;
                 	}
-                    else if (selectDatabase) {//////////////////////////////////////////////////////////////////////////////////////////////
-                        index ++;
+                    else*/
+                if (selectDatabase) {//////////////////////////////////////////////////////////////////////////////////////////////
+                    index++;
+                        /*16
                         if (databaseManager.database_exists(tokenList.get(index).tok)) {
                             report_error("CODE: 21B [ERROR] The Database name already exists.");
                             break;
                         }
-
-                        index++;
-                        debug("^^^ 6commandList: "+tokenList.get(index).tok);
-                        if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                            report_error("CODE: 21C [ERROR] This should be a semicolon and end of statment.");
-                            break;
-                        }
-
-                        database = databaseManager.get_database(tokenList.get(index-1).tok);
-                        databaseDataDefinitionManager = new DatabaseDataDefinitionManager(database);
-                        databaseDataManipulationManager = new DatabaseDataManipulationManager(database);
-                        databaseWDataManipulationManager = new DatabaseDataWManipulationManager(database);
-                    }
-                }
-                catch (Exception e) {
-                	report_error("CODE: 21-0 [ERROR] Must load a database first.");
-                	break;
-                }
-                
-                tableNameG = tokenList.get(index).tok;
-				
-				index++;
-            	debug("^^^ 20commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                    report_error("CODE:  [ERROR] looking for semicolon.");
-                    break;
-                }
-                
-                debug("ACCEPT");
-                System.out.println(databaseDataManipulationManager.table_select(tableNameG));
-                break;
-
-
-            case "WSELECT":
-                index++;
-                debug("^^^ 24commandList: "+tokenList.get(index).tok);
-                
-                boolean isAsterick = Objects.equals(tokenList.get(index).tok, "*");
-                boolean isValidAttribute = database.table(tableNameG).get_attribute(tokenList.get(index).tok) != null;
-                
-                if (!isAsterick && !isValidAttribute) {
-                	report_error("CODE: 40 [ERROR] either the attribute name doesn't exists or you didn't select star.");
-                	break;
-                }
-                
-                if (isAsterick) {
+                        */
                     index++;
-                    debug("^^^ 25commandList: "+tokenList.get(index).tok);
-                    if (!Objects.equals(tokenList.get(index).tok, "FROM")) {
-                    	report_error("CODE: 40-2 [ERROR] Expected FROM.");
-                		break;
-                    }
-					
-                    index++;
-                    debug("^^^ 26commandList: "+tokenList.get(index).tok);
-                    if (database.table(tokenList.get(index).tok) == null) {
-                    	report_error("CODE: 29 [ERROR] this table name does not exists.");
-                    	break;
-                    }
-					
-                    tableNameG = tokenList.get(index).tok;
-					
-                    index++;
-                    debug("^^^ 27commandList: "+tokenList.get(index).tok);
+                    debug("^^^ 6commandList: " + tokenList.get(index).tok);
                     if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                        report_error("CODE: 28 [ERROR] looking for semicolon.");
-                        break;
+                        report_error("CODE: 21C [ERROR] This should be a semicolon and end of statment.");
+                        //break;//16;
                     }
-                    
-                    debug("ACCEPT");
-                    //TO DO
-                }
-                
-                else if (isValidAttribute) {
-                    index ++;
-                    if (Objects.equals(tokenList.get(index).tok, ",")) {
-                        index++;
-                        fields(index);
-                    }
-                    
-                    if (!Objects.equals(tokenList.get(index).tok, ")")) {
-                    	report_error("CODE: 39 [ERROR] missing a comma or closed parenthesis.");
-                    	break;
-                    }
-					
-                    index++;
-                    debug("^^^ 30commandList: "+tokenList.get(index).tok);
-                    if (!Objects.equals(tokenList.get(index).tok, "FROM")) {
-                    	report_error("CODE: 38 [ERROR] missing the key word FROM.");
-                        break;
-                    }
-					
-                	index++;
-                    debug("^^^ 31commandList: "+tokenList.get(index).tok);
-                    if (database.table(tokenList.get(index).tok) == null) {
-                    	 report_error("CODE: 37 [ERROR] this table name does not exists.");
-                    	 break;
-                    }
-					
-                    index++;
-                    debug("^^^ 33commandList: "+tokenList.get(index).tok);
-                    
-                    boolean isSemicolon = Objects.equals(tokenList.get(index).tok, ";");
-                    boolean isWhere = Objects.equals(tokenList.get(index).tok, "WHERE");
-                    
-                    if (!isSemicolon && !isWhere) {
-                    	report_error("CODE: 36 [ERROR] looking for semicolon or the key word WHERE.");
-                    	break;
-                    }
-                    
-                    if (isSemicolon) {
-						debug("ACCEPT!");
-                        debug("The field attributes are: " +attributes);
-                    	debug("The field attribute types are: " +attributeTypes);
-                    	//TODO
-                    }
-                    
-                    else if (Objects.equals(tokenList.get(index).tok, "WHERE")) {
-						index++;
-                        debug("^^^ 33commandList: "+tokenList.get(index).tok);
-                        if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
-                        	report_error("CODE: 35 [ERROR] This attribute name doesn't exist.");
-                        	break;
-                        }
-                        
-                        attributeNameG = tokenList.get(index).tok;
-						
-                        index++;
-                        if (!Objects.equals(tokenList.get(index).tok, "<") && !Objects.equals(tokenList.get(index).tok, ">") && !Objects.equals(tokenList.get(index).tok, "<>") && !Objects.equals(tokenList.get(index).tok, "<=") && !Objects.equals(tokenList.get(index).tok, ">=") && !Objects.equals(tokenList.get(index).tok, "=")) {
-                        	report_error("CODE: 34 [ERROR] missing an operator.");
-                        	break;
-                        }
-                        
-                        index++;
-                        valueNameG = tokenList.get(index).tok;
-						
-                        index ++;
-                        if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                        	report_error("CODE: 34 [ERROR] missing an operator.");
-                        	break;
-                        }
-                        
-                        debug("ACCEPT");
-                        //TODO
-                    }
-                }
-                break;
 
-            case "INSERT":
-                int dummy = 0;
-                int numberOfFields;
-                
-                index++;
-                debug("^^^ 41commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, "INTO")) {
-                	 report_error("CODE: 66 [ERROR] missing the key word INTO.");
-                	 break;
+                    //database = databaseManager.get_database(tokenList.get(index-1).tok);//16
+                    //databaseDataDefinitionManager = new DatabaseDataDefinitionManager(database);//16
+                    //databaseDataManipulationManager = new DatabaseDataManipulationManager(database);//16
+                    //databaseWDataManipulationManager = new DatabaseDataWManipulationManager(database);//16
                 }
-				
-                index++;
-                debug("^^^ 42commandList: "+tokenList.get(index).tok);
-                if (database.table(tokenList.get(index).tok) == null) {
-                	report_error("CODE: 65 [ERROR] this table name does not exists.");
-                	break;
-                }
-                
-            	tableNameG = tokenList.get(index).tok;
-				
-                index++;
-                debug("^^^ 43commandList: "+tokenList.get(index).tok);
-                boolean isLeftParam = Objects.equals(tokenList.get(index).tok, "(");
-                boolean isValues = Objects.equals(tokenList.get(index).tok, "VALUES");
-                if (!isLeftParam && !isValues) {
-                	report_error("CODE: 64 [ERROR] there should be a open parenthesis or the key word VALUES.");
-                	break;
-                }
-                
-                if (isLeftParam) {
-                	dummy = 1;
-                	
-					index++;
-					if (Objects.equals(tokenList.get(index).tok, "'"))
-						index++;
-                    
-                    debug("^^^ 44commandList: "+tokenList.get(index).tok);
-                    if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
-                        report_error("CODE: 56 [ERROR] this attribute name does not exists.");
-                        break;
-                    }
-					
-                    attributes.add(tokenList.get(index).tok);
-					index++;
-					if (Objects.equals(tokenList.get(index).tok, "'"))
-						index++;
-					
-                	debug("^^^ 45commandList: "+tokenList.get(index).tok);
-                    if (Objects.equals(tokenList.get(index).tok, ",")) {
-						index++;
-                        numberOfFields = fieldsInsert(index);
-                    }
-                    
-                    if (!Objects.equals(tokenList.get(index).tok, ")")) {
-                    	report_error("CODE: 55 [ERROR] missing the closed parenthesis.");
-                    	break;
-                    }
-					
-					index++;
-                    debug("^^^ 46commandList: "+tokenList.get(index).tok);
-                    if (!Objects.equals(tokenList.get(index).tok, "VALUES")) {
-                    	report_error("CODE: 54 [ERROR] missing the key word VALUES.");
-                    	break;
-                    }
-					
-                    index++;
-                    debug("^^^ 47commandList: "+tokenList.get(index).tok);
-                    if (!Objects.equals(tokenList.get(index).tok, "(")) {
-                    	report_error("CODE: 53 [ERROR] missing an open parenthesis.");
-                    	break;
-                    }
-					
-					index++;
-                    if (Objects.equals(tokenList.get(index).tok, "'"))
-						index++;
-					
-                    debug("^^^ 48commandList: "+tokenList.get(index).tok);
-                    if (!Objects.equals("ID", tokenList.get(index).type) && !Objects.equals("NUM", tokenList.get(index).type)) {
-                    	report_error("CODE: 52 [ERROR] this should be of type ID or NUM.");
-                    	break;
-                    }
-                    
-                    values.add(tokenList.get(index).tok);
-					
-					index++;
-                    if (Objects.equals(tokenList.get(index).tok, "'"))
-						index++;
-					
-                    debug("^^^ 49commandList: "+tokenList.get(index).tok);
-                    if (Objects.equals(tokenList.get(index).tok, ",")) {
-						index++;
-                        numberOfFields = valuesInsert(index);
-                   	}
-                    
-                    if (!Objects.equals(tokenList.get(index).tok, ")")) {
-                    	report_error("CODE: 51 [ERROR] this should be an end parenthesis.");
-                    	break;
-                    }
-                    
-                    index++;
-                    if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                    	report_error("CODE: 50 [ERROR] missing a semicolon.");
-                    	break;
-                    }
-                    
-                    debug("ACCEPT!");
-                    debug("The field attributes are: " +attributes);
-                    debug("The field values are: " +values);
-                   	databaseDataManipulationManager.table_insert(tableNameG, attributes, values);
-                    reset_global_storage();
-                } 
-                
-                else if (isValues) {
-                    index++;
-                    debug("^^^ 57commandList@: "+tokenList.get(index).tok);
-               	    if (!Objects.equals(tokenList.get(index).tok, "(")) {
-                        report_error("CODE: 63 [ERROR] missing an open parenthesis.");
-                        break;
-                    }
-                    
-                    index++;
-					if (Objects.equals(tokenList.get(index).tok, "'"))
-						index++;
-                    
-                    debug("^^^ 58commandList@@: "+tokenList.get(index).tok);
-                    if (!Objects.equals("ID", tokenList.get(index).type) && !Objects.equals("NUM", tokenList.get(index).type)) {
-                        report_error("CODE: 62 [ERROR] this should be of type ID or NUM.");
-                        break;
-                    }
-                	
-                    values.add(tokenList.get(index).tok);
-                    
-					index++;
-					if (Objects.equals(tokenList.get(index).tok, "'"))
-						index++;
-					
-                    debug("^^^ 59commandList@@@: "+tokenList.get(index).tok);
-                    if (Objects.equals(tokenList.get(index).tok, ",")) {
-		 				index++;
-                        numberOfFields = valuesInsert(index);
-                    }
-                    
-                    if (!Objects.equals(tokenList.get(index).tok, ")")) {
-                        report_error("CODE: 61 [ERROR] this should be an end param.");
-                        break;
-                    }
-                	
-                	index++;
-                    if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                        report_error("CODE: 60 [ERROR] missing a semicolon.");
-                        break;
-                    }
-                    
-                    debug("ACCEPT!");
-                    debug("The field values are: " +values);
-                	databaseDataManipulationManager.table_insert(tableNameG, values);
-                    reset_global_storage();
-                }
-                break;
+            } catch (Exception e) {
+                report_error("CODE: 21-0 [ERROR] Must load a database first.");
+                //break;//16;
+            }
 
-            case "DELETE":
+            tableNameG = tokenList.get(index).tok;
+
+            index++;
+            debug("^^^ 20commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                report_error("CODE:  [ERROR] looking for semicolon.");
+                //break;//16;
+            }
+
+            debug("ACCEPT");
+            //System.out.println(databaseDataManipulationManager.table_select(tableNameG));//16
+
+        } /*else if (s.equals("WSELECT")) {
+            index++;
+            debug("^^^ 24commandList: " + tokenList.get(index).tok);
+
+            boolean isAsterick = Objects.equals(tokenList.get(index).tok, "*");
+            //boolean isValidAttribute = database.table(tableNameG).get_attribute(tokenList.get(index).tok) != null;//16
+            boolean isValidAttribute = true;//16
+
+            if (!isAsterick && !isValidAttribute) {
+                report_error("CODE: 40 [ERROR] either the attribute name doesn't exists or you didn't select star.");
+                //break;//16;
+            }
+
+            if (isAsterick) {
                 index++;
-                debug("^^^ 67commandList: "+tokenList.get(index).tok);
+                debug("^^^ 25commandList: " + tokenList.get(index).tok);
                 if (!Objects.equals(tokenList.get(index).tok, "FROM")) {
-                	report_error("CODE: 75 [ERROR] Where is the key word FROM ");
-                	break;
+                    report_error("CODE: 40-2 [ERROR] Expected FROM.");
+                    //break;//16;
                 }
-				
-                index++;
-                debug("^^^ 68commandList: "+tokenList.get(index).tok);
-                if (database.table(tokenList.get(index).tok) == null) {
-                	report_error("CODE: 74 [ERROR] this table name does not exists.");
-                	break;
-                }
-                
-                tableNameG = tokenList.get(index).tok;
-				
-                index++;
-                debug("^^^ 69commandList: "+tokenList.get(index).tok);
-                
-                if (!Objects.equals(tokenList.get(index).tok, ";") && !Objects.equals(tokenList.get(index).tok, "WHERE")) {
-                	 report_error("CODE: 73 [ERROR] looking for semicolon or the key word WHERE.");
-                	 break;
-                }
-                
-                if (Objects.equals(tokenList.get(index).tok, "WHERE")) {
-					index++;
-                    debug("^^^ 70commandList: "+tokenList.get(index).tok);
-                    
-                    if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
-                    	report_error("CODE: 72 [ERROR] This attribute name doesn't exist.");
-                    	break;
-                    }
-                    
-                    attributeNameG = tokenList.get(index).tok;
-					
-                    index++;
-                    if (Objects.equals(tokenList.get(index).tok, "<") || Objects.equals(tokenList.get(index).tok, ">") || Objects.equals(tokenList.get(index).tok, "<>") || Objects.equals(tokenList.get(index).tok, "<=") || Objects.equals(tokenList.get(index).tok, ">=") || Objects.equals(tokenList.get(index).tok, "=")) {
-                    	index++;
-                    	valueNameG = tokenList.get(index).tok;
-						
-						index++;
-                        
-                        if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                        	debug("71 [ERROR] missing an operator.");
-                        	break;
-                        }
-                        
-                        debug("ACCEPT");
-                        databaseDataManipulationManager.table_delete(tableNameG,attributeNameG,valueNameG );
-					}
-                }
-                break;
 
-            case "UPDATE":
                 index++;
-                debug("^^^ 76commandList: "+tokenList.get(index).tok);
-                if (database.table(tokenList.get(index).tok) == null) {
-                	report_error("CODE: 90 [ERROR] this table does not exists.");
-                	break;
-                }
-                
+                debug("^^^ 26commandList: " + tokenList.get(index).tok);
+                    //16
+                    //if (database.table(tokenList.get(index).tok) == null) {
+                    	//report_error("CODE: 29 [ERROR] this table name does not exists.");
+                    	//break;
+                    //}
+
                 tableNameG = tokenList.get(index).tok;
-				
+
                 index++;
-                debug("^^^ 77commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, "SET")) {
-                    report_error("CODE: 89 [ERROR] the key word SET is missing.");
-                    break;
+                debug("^^^ 27commandList: " + tokenList.get(index).tok);
+                if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                    report_error("CODE: 28 [ERROR] looking for semicolon.");
+                    //break;//16;
                 }
-				
+
+                debug("ACCEPT");
+                //TO DO
+            } else if (isValidAttribute) {
                 index++;
-                debug("^^^ 78commandList: "+tokenList.get(index).tok);
-                if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
-                    report_error("CODE: 88 [ERROR] the attribute does not exist.");
-                    break;
-                }
-				
-				attributes.add(tokenList.get(index).tok);
-				
-                index++;
-                debug("^^^ 79commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, "=")) {
-                    report_error("CODE: 87 [ERROR] the equal sign is missing.");
-                    break;
-                }
-				
-                index++;
-                debug("^^^ 80commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index+2).type, tokenList.get(index).type)) {
-                    report_error("CODE: 86 [ERROR] the data types don't match.");
-                    break;
-                }
-                
-                firstOperand.add(tokenList.get(index).tok);
-                actions.add(tokenList.get(index+1).tok);
-                secondOperand.add(tokenList.get(index+2).tok);
-				
-                index +=3;
-                debug("^^^ 81commandList: "+tokenList.get(index).tok);
-                
                 if (Objects.equals(tokenList.get(index).tok, ",")) {
-					index++;
-                    fieldName_expression(index);
+                    index++;
+                    fields(index);
                 }
-                
+
+                if (!Objects.equals(tokenList.get(index).tok, ")")) {
+                    report_error("CODE: 39 [ERROR] missing a comma or closed parenthesis.");
+                    //break;//16;
+                }
+
+                index++;
+                debug("^^^ 30commandList: " + tokenList.get(index).tok);
+                if (!Objects.equals(tokenList.get(index).tok, "FROM")) {
+                    report_error("CODE: 38 [ERROR] missing the key word FROM.");
+                    //break;//16;
+                }
+
+                index++;
+                debug("^^^ 31commandList: " + tokenList.get(index).tok);
+                    //16
+                    //if (database.table(tokenList.get(index).tok) == null) {
+                    	 //report_error("CODE: 37 [ERROR] this table name does not exists.");
+                    	 //break;
+                    //}
+
+                index++;
+                debug("^^^ 33commandList: " + tokenList.get(index).tok);
+
                 boolean isSemicolon = Objects.equals(tokenList.get(index).tok, ";");
                 boolean isWhere = Objects.equals(tokenList.get(index).tok, "WHERE");
-                
-                if (!isSemicolon && !isWhere) {
-                	report_error("CODE: 85 [ERROR] looking for semicolon or the key word WHERE.");
-                	break;
-                }
-                
-                if (isSemicolon) {
-					debug("ACCEPT!");
-                    debug("The first operand is: " +firstOperand);
-                    debug("The operator is: " +actions);
-                    debug("The second operand is: " +secondOperand);
-                    debug("Attributes: "+attributes);
-                    databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions, secondOperand);
-					reset_global_storage();
-                }
-                
-                else if (isWhere) {
-                    index++;
-                    debug("^^^ 82commandList: "+tokenList.get(index).tok);
-                    if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
-                    	report_error("CODE: 84 [ERROR] This attribute name doesn't exist.");
-                    	break;
-                    }
-                    
-                    attributeNameG = tokenList.get(index).tok;
-                    
-                    index++;
-                    if (!Objects.equals(tokenList.get(index).tok, "<") && !Objects.equals(tokenList.get(index).tok, ">") && !Objects.equals(tokenList.get(index).tok, "<>") && !Objects.equals(tokenList.get(index).tok, "<=") && !Objects.equals(tokenList.get(index).tok, ">=") && !Objects.equals(tokenList.get(index).tok, "=")) {
-                    	report_error("83 [ERROR] missing an operator.");
-                    	break;
-                    }
-                    
-                    index++;
-                    valueNameG = tokenList.get(index).tok;
-                    
-                    index ++;
-                            
-                     if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                     	report_error("83-2 [ERROR] missing a semicolon.");
-                     	break;
-                     }
-                    
-                    debug("ACCEPT");
-                    debug("The first operand is: " +firstOperand);
-                    debug("The operator is: " +actions);
-                    debug("The second operand is: " +secondOperand);
-                    databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions, secondOperand, attributeNameG,valueNameG);
-                    reset_global_storage();
-                }
-                break;
 
-
-            case "WUPDATE":
-                index++;
-                debug("^^^ 91commandList: "+tokenList.get(index).tok);
-                if (database.table(tokenList.get(index).tok) == null) {
-                	report_error("CODE: 105 [ERROR] this table does not exists.");
-                	break;
-                }
-                
-				tableNameG = tokenList.get(index).tok;
-				
-                index++;
-                debug("^^^ 92commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, "SET")) {
-                    report_error("CODE: 104 [ERROR] the key word SET is missing.");
-                    break;
-                }
-				
-                index++;
-                debug("^^^ 93commandList: "+tokenList.get(index).tok);
-                if (Objects.equals(tokenList.get(index).tok, "DATE")) {
-                    long totalTime = dateAndTime(index);
-                    break;
-				}
-                
-                if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
-                	report_error("CODE: 103 [ERROR] there should be a valid attribute.");
-                }
-                
-                attributes.add(tokenList.get(index).tok);
-                
-                index++;
-                debug("^^^ 94commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, "=")) {
-                	report_error("CODE: 102 [ERROR] the equal sign is missing.");
-                	break;
-                }
-                
-                index++;
-                debug("^^^ 95commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index+2).type, tokenList.get(index).type)) {
-                	report_error("CODE: 101 [ERROR] the data types don't match.");
-                	break;
-                }
-                
-                firstOperand.add(tokenList.get(index).tok);
-                actions.add(tokenList.get(index+1).tok);
-                secondOperand.add(tokenList.get(index+2).tok);
-				
-                index +=3;
-                debug("^^^ 96commandList: "+tokenList.get(index).tok);
-                if (Objects.equals(tokenList.get(index).tok, ",")) {
-					index++;
-                    fieldName_expression(index);
-            	}
-            	
-            	isSemicolon = Objects.equals(tokenList.get(index).tok, ";");
-                isWhere = Objects.equals(tokenList.get(index).tok, "WHERE");
-                
                 if (!isSemicolon && !isWhere) {
-                	report_error("CODE: 100 [ERROR] looking for semicolon or the key word WHERE.");
-                	break;
+                    report_error("CODE: 36 [ERROR] looking for semicolon or the key word WHERE.");
+                    //break;//16;
                 }
-                
+
                 if (isSemicolon) {
                     debug("ACCEPT!");
-                    debug("The first operand is: " +firstOperand);
-                    debug("The operator is: " +actions);
-                    debug("The second operand is: " +secondOperand);
-                    debug("Attributes: "+attributes);
-                    databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions,secondOperand);
-					reset_global_storage();
-                }
-                
-                else if (isWhere) {
-					index++;
-                    debug("^^^ 97commandList: "+tokenList.get(index).tok);
-                    if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
-                    	report_error("CODE: 99 [ERROR] This attribute name already exists.");
-                    	break;
-                    }
-                    
+                    debug("The field attributes are: " + attributes);
+                    debug("The field attribute types are: " + attributeTypes);
+                    //TODO
+                } else if (Objects.equals(tokenList.get(index).tok, "WHERE")) {
+                    index++;
+                    debug("^^^ 33commandList: " + tokenList.get(index).tok);
+                        //16
+                        //if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
+                        	//report_error("CODE: 35 [ERROR] This attribute name doesn't exist.");
+                        	//break;
+                        //}
+
+
                     attributeNameG = tokenList.get(index).tok;
-					
-					index++;
+
+                    index++;
                     if (!Objects.equals(tokenList.get(index).tok, "<") && !Objects.equals(tokenList.get(index).tok, ">") && !Objects.equals(tokenList.get(index).tok, "<>") && !Objects.equals(tokenList.get(index).tok, "<=") && !Objects.equals(tokenList.get(index).tok, ">=") && !Objects.equals(tokenList.get(index).tok, "=")) {
-						report_error("CODE: 98 [ERROR] missing an operator.");
-						break;
-					}
-                    
+                        report_error("CODE: 34 [ERROR] missing an operator.");
+                        //break;//16;
+                    }
+
                     index++;
                     valueNameG = tokenList.get(index).tok;
-					
-					index ++;
+
+                    index++;
                     if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                    	report_error("CODE: 98-2 [ERROR] missing semicolon.");
-						break;
-                    }	
-                    
+                        report_error("CODE: 34 [ERROR] missing an operator.");
+                        //break;//16;
+                    }
+
                     debug("ACCEPT");
-                    debug("The first operand is: " +firstOperand);
-                    debug("The operator is: " +actions);
-                    debug("The second operand is: " +secondOperand);
-                    databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions,secondOperand,attributeNameG,valueNameG);
-					reset_global_storage();
-				}
-                break;
+                    //TODO
+                }
+            }
 
-            case "SAVE":
-            case "COMMIT":
+        } else if (s.equals("INSERT")) {
+            int dummy = 0;
+            int numberOfFields;
+
+            index++;
+            debug("^^^ 41commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "INTO")) {
+                report_error("CODE: 66 [ERROR] missing the key word INTO.");
+                //break;//16;
+            }
+
+            index++;
+            debug("^^^ 42commandList: " + tokenList.get(index).tok);
+                //16
+                //if (database.table(tokenList.get(index).tok) == null) {
+                	//report_error("CODE: 65 [ERROR] this table name does not exists.");
+                	//break;
+                //}
+
+
+            tableNameG = tokenList.get(index).tok;
+
+            index++;
+            debug("^^^ 43commandList: " + tokenList.get(index).tok);
+            boolean isLeftParam = Objects.equals(tokenList.get(index).tok, "(");
+            boolean isValues = Objects.equals(tokenList.get(index).tok, "VALUES");
+            if (!isLeftParam && !isValues) {
+                report_error("CODE: 64 [ERROR] there should be a open parenthesis or the key word VALUES.");
+                //break;//16;
+            }
+
+            if (isLeftParam) {
+                dummy = 1;
+
                 index++;
-                debug("^^^ 106commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                   report_error("CODE: 107 [ERROR] Where is the semicolon ");
-                   break;
-                }
-                
-                debug("ACCEPT");
-                databaseManager.save_database(database);
-                break;
+                if (Objects.equals(tokenList.get(index).tok, "'"))
+                    index++;
 
-            case "LOAD":
+                debug("^^^ 44commandList: " + tokenList.get(index).tok);
+                    //16
+                    //if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
+                        //report_error("CODE: 56 [ERROR] this attribute name does not exists.");
+                        //break;
+                    //}
+
+                attributes.add(tokenList.get(index).tok);
                 index++;
-                debug("^^^ 108commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, "DATABASE")) {
-                	report_error("CODE: 112 [ERROR] This should be the key word DATABASE after LOAD.");
-                }
-                
-                index += 2;
-            	debug("^^^ 110commandList: "+tokenList.get(index).tok);
-                if (!Objects.equals(tokenList.get(index).tok, ";")) {
-                	report_error("CODE: 111 [ERROR] This should be a semicolon and end of statment.");
-                	break;
-                }
-                
-                debug("ACCEPT");
-                database = databaseManager.get_database(tokenList.get(index-1).tok);
-                databaseDataDefinitionManager = new DatabaseDataDefinitionManager(database);
-                databaseDataManipulationManager = new DatabaseDataManipulationManager(database);
-                databaseWDataManipulationManager = new DatabaseDataWManipulationManager(database);
-                break;
+                if (Objects.equals(tokenList.get(index).tok, "'"))
+                    index++;
 
-            default:
-            	report_error("CODE: 113 [ERROR] wrong first key word.");
-                break;
+                debug("^^^ 45commandList: " + tokenList.get(index).tok);
+                if (Objects.equals(tokenList.get(index).tok, ",")) {
+                    index++;
+                    numberOfFields = fieldsInsert(index);
+                }
+
+                if (!Objects.equals(tokenList.get(index).tok, ")")) {
+                    report_error("CODE: 55 [ERROR] missing the closed parenthesis.");
+                    //break;//16;
+                }
+
+                index++;
+                debug("^^^ 46commandList: " + tokenList.get(index).tok);
+                if (!Objects.equals(tokenList.get(index).tok, "VALUES")) {
+                    report_error("CODE: 54 [ERROR] missing the key word VALUES.");
+                    //break;//16;
+                }
+
+                index++;
+                debug("^^^ 47commandList: " + tokenList.get(index).tok);
+                if (!Objects.equals(tokenList.get(index).tok, "(")) {
+                    report_error("CODE: 53 [ERROR] missing an open parenthesis.");
+                    //break;//16;
+                }
+
+                index++;
+                if (Objects.equals(tokenList.get(index).tok, "'"))
+                    index++;
+
+                debug("^^^ 48commandList: " + tokenList.get(index).tok);
+                if (!Objects.equals("ID", tokenList.get(index).type) && !Objects.equals("NUM", tokenList.get(index).type)) {
+                    report_error("CODE: 52 [ERROR] this should be of type ID or NUM.");
+                    //break;//16;
+                }
+
+                values.add(tokenList.get(index).tok);
+
+                index++;
+                if (Objects.equals(tokenList.get(index).tok, "'"))
+                    index++;
+
+                debug("^^^ 49commandList: " + tokenList.get(index).tok);
+                if (Objects.equals(tokenList.get(index).tok, ",")) {
+                    index++;
+                    numberOfFields = valuesInsert(index);
+                }
+
+                if (!Objects.equals(tokenList.get(index).tok, ")")) {
+                    report_error("CODE: 51 [ERROR] this should be an end parenthesis.");
+                    //break;//16;
+                }
+
+                index++;
+                if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                    report_error("CODE: 50 [ERROR] missing a semicolon.");
+                    //break;//16;
+                }
+
+                debug("ACCEPT!");
+                debug("The field attributes are: " + attributes);
+                debug("The field values are: " + values);
+                //databaseDataManipulationManager.table_insert(tableNameG, attributes, values);//16
+                reset_global_storage();
+            } else if (isValues) {
+                index++;
+                debug("^^^ 57commandList@: " + tokenList.get(index).tok);
+                if (!Objects.equals(tokenList.get(index).tok, "(")) {
+                    report_error("CODE: 63 [ERROR] missing an open parenthesis.");
+                    //break;//16;
+                }
+
+                index++;
+                if (Objects.equals(tokenList.get(index).tok, "'"))
+                    index++;
+
+                debug("^^^ 58commandList@@: " + tokenList.get(index).tok);
+                if (!Objects.equals("ID", tokenList.get(index).type) && !Objects.equals("NUM", tokenList.get(index).type)) {
+                    report_error("CODE: 62 [ERROR] this should be of type ID or NUM.");
+                    //break;//16;
+                }
+
+                values.add(tokenList.get(index).tok);
+
+                index++;
+                if (Objects.equals(tokenList.get(index).tok, "'"))
+                    index++;
+
+                debug("^^^ 59commandList@@@: " + tokenList.get(index).tok);
+                if (Objects.equals(tokenList.get(index).tok, ",")) {
+                    index++;
+                    numberOfFields = valuesInsert(index);
+                }
+
+                if (!Objects.equals(tokenList.get(index).tok, ")")) {
+                    report_error("CODE: 61 [ERROR] this should be an end param.");
+                    //break;//16;
+                }
+
+                index++;
+                if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                    report_error("CODE: 60 [ERROR] missing a semicolon.");
+                    //break;//16;
+                }
+
+                debug("ACCEPT!");
+                debug("The field values are: " + values);
+                //databaseDataManipulationManager.table_insert(tableNameG, values);//16
+                reset_global_storage();
+            }
+
+        } else if (s.equals("DELETE")) {
+            index++;
+            debug("^^^ 67commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "FROM")) {
+                report_error("CODE: 75 [ERROR] Where is the key word FROM ");
+                //break;//16;
+            }
+
+            index++;
+            debug("^^^ 68commandList: " + tokenList.get(index).tok);
+                //16
+                //if (database.table(tokenList.get(index).tok) == null) {
+                	//report_error("CODE: 74 [ERROR] this table name does not exists.");
+                	//break;
+                //}
+
+            tableNameG = tokenList.get(index).tok;
+
+            index++;
+            debug("^^^ 69commandList: " + tokenList.get(index).tok);
+
+            if (!Objects.equals(tokenList.get(index).tok, ";") && !Objects.equals(tokenList.get(index).tok, "WHERE")) {
+                report_error("CODE: 73 [ERROR] looking for semicolon or the key word WHERE.");
+                //break;//16;
+            }
+
+            if (Objects.equals(tokenList.get(index).tok, "WHERE")) {
+                index++;
+                debug("^^^ 70commandList: " + tokenList.get(index).tok);
+                    //16
+                    //if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
+                    	//report_error("CODE: 72 [ERROR] This attribute name doesn't exist.");
+                    	//break;
+                    //}
+
+                attributeNameG = tokenList.get(index).tok;
+
+                index++;
+                if (Objects.equals(tokenList.get(index).tok, "<") || Objects.equals(tokenList.get(index).tok, ">") || Objects.equals(tokenList.get(index).tok, "<>") || Objects.equals(tokenList.get(index).tok, "<=") || Objects.equals(tokenList.get(index).tok, ">=") || Objects.equals(tokenList.get(index).tok, "=")) {
+                    index++;
+                    valueNameG = tokenList.get(index).tok;
+
+                    index++;
+
+                    if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                        debug("71 [ERROR] missing an operator.");
+                        //break;//16;
+                    }
+
+                    debug("ACCEPT");
+                    //databaseDataManipulationManager.table_delete(tableNameG,attributeNameG,valueNameG );//16
+                }
+            }
+
+        } else if (s.equals("UPDATE")) {
+            index++;
+            debug("^^^ 76commandList: " + tokenList.get(index).tok);
+                //16
+                //if (database.table(tokenList.get(index).tok) == null) {
+                	//report_error("CODE: 90 [ERROR] this table does not exists.");
+                	//break;
+                //}
+
+            tableNameG = tokenList.get(index).tok;
+
+            index++;
+            debug("^^^ 77commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "SET")) {
+                report_error("CODE: 89 [ERROR] the key word SET is missing.");
+                //break;//16;
+            }
+
+            index++;
+            debug("^^^ 78commandList: " + tokenList.get(index).tok);
+                //16
+                //if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
+                    //report_error("CODE: 88 [ERROR] the attribute does not exist.");
+                    //break;
+                //}
+
+            attributes.add(tokenList.get(index).tok);
+
+            index++;
+            debug("^^^ 79commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "=")) {
+                report_error("CODE: 87 [ERROR] the equal sign is missing.");
+                //break;//16;
+            }
+
+            index++;
+            debug("^^^ 80commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index + 2).type, tokenList.get(index).type)) {
+                report_error("CODE: 86 [ERROR] the data types don't match.");
+                //break;//16;
+            }
+
+            firstOperand.add(tokenList.get(index).tok);
+            actions.add(tokenList.get(index + 1).tok);
+            secondOperand.add(tokenList.get(index + 2).tok);
+
+            index += 3;
+            debug("^^^ 81commandList: " + tokenList.get(index).tok);
+
+            if (Objects.equals(tokenList.get(index).tok, ",")) {
+                index++;
+                fieldName_expression(index);
+            }
+
+            boolean isSemicolon = Objects.equals(tokenList.get(index).tok, ";");
+            boolean isWhere = Objects.equals(tokenList.get(index).tok, "WHERE");
+
+            if (!isSemicolon && !isWhere) {
+                report_error("CODE: 85 [ERROR] looking for semicolon or the key word WHERE.");
+                //break;//16;
+            }
+
+            if (isSemicolon) {
+                debug("ACCEPT!");
+                debug("The first operand is: " + firstOperand);
+                debug("The operator is: " + actions);
+                debug("The second operand is: " + secondOperand);
+                debug("Attributes: " + attributes);
+                //databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions, secondOperand);//16
+                reset_global_storage();
+            } else if (isWhere) {
+                index++;
+                debug("^^^ 82commandList: " + tokenList.get(index).tok);
+                    //16
+                    //if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
+                    	//report_error("CODE: 84 [ERROR] This attribute name doesn't exist.");
+                    	//break;
+                    //}
+
+                attributeNameG = tokenList.get(index).tok;
+
+                index++;
+                if (!Objects.equals(tokenList.get(index).tok, "<") && !Objects.equals(tokenList.get(index).tok, ">") && !Objects.equals(tokenList.get(index).tok, "<>") && !Objects.equals(tokenList.get(index).tok, "<=") && !Objects.equals(tokenList.get(index).tok, ">=") && !Objects.equals(tokenList.get(index).tok, "=")) {
+                    report_error("83 [ERROR] missing an operator.");
+                    //break;//16;
+                }
+
+                index++;
+                valueNameG = tokenList.get(index).tok;
+
+                index++;
+
+                if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                    report_error("83-2 [ERROR] missing a semicolon.");
+                    //break;//16;
+                }
+
+                debug("ACCEPT");
+                debug("The first operand is: " + firstOperand);
+                debug("The operator is: " + actions);
+                debug("The second operand is: " + secondOperand);
+                //16
+                //databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions, secondOperand, attributeNameG,valueNameG);//16
+                reset_global_storage();
+            }
+
+        } else if (s.equals("WUPDATE")) {
+            boolean isWhere;
+            boolean isSemicolon;
+            index++;
+            debug("^^^ 91commandList: " + tokenList.get(index).tok);
+                //16
+                //if (database.table(tokenList.get(index).tok) == null) {
+                	//report_error("CODE: 105 [ERROR] this table does not exists.");
+                	//break;
+                //}
+
+
+            tableNameG = tokenList.get(index).tok;
+
+            index++;
+            debug("^^^ 92commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "SET")) {
+                report_error("CODE: 104 [ERROR] the key word SET is missing.");
+                //break;//16;
+            }
+
+            index++;
+            debug("^^^ 93commandList: " + tokenList.get(index).tok);
+            if (Objects.equals(tokenList.get(index).tok, "DATE")) {
+                long totalTime = dateAndTime(index);
+                //break;//16;
+            }
+
+                //16
+                //if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
+                	//report_error("CODE: 103 [ERROR] there should be a valid attribute.");
+                //}
+
+            attributes.add(tokenList.get(index).tok);
+
+            index++;
+            debug("^^^ 94commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "=")) {
+                report_error("CODE: 102 [ERROR] the equal sign is missing.");
+                //break;//16;
+            }
+
+            index++;
+            debug("^^^ 95commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index + 2).type, tokenList.get(index).type)) {
+                report_error("CODE: 101 [ERROR] the data types don't match.");
+                //break;//16;
+            }
+
+            firstOperand.add(tokenList.get(index).tok);
+            actions.add(tokenList.get(index + 1).tok);
+            secondOperand.add(tokenList.get(index + 2).tok);
+
+            index += 3;
+            debug("^^^ 96commandList: " + tokenList.get(index).tok);
+            if (Objects.equals(tokenList.get(index).tok, ",")) {
+                index++;
+                fieldName_expression(index);
+            }
+
+            isSemicolon = Objects.equals(tokenList.get(index).tok, ";");
+            isWhere = Objects.equals(tokenList.get(index).tok, "WHERE");
+
+            if (!isSemicolon && !isWhere) {
+                report_error("CODE: 100 [ERROR] looking for semicolon or the key word WHERE.");
+                //break;//16;
+            }
+
+            if (isSemicolon) {
+                debug("ACCEPT!");
+                debug("The first operand is: " + firstOperand);
+                debug("The operator is: " + actions);
+                debug("The second operand is: " + secondOperand);
+                debug("Attributes: " + attributes);
+                //16
+                //databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions,secondOperand);//16
+                reset_global_storage();
+            } else if (isWhere) {
+                index++;
+                debug("^^^ 97commandList: " + tokenList.get(index).tok);
+                    //16
+                    //if (database.table(tableNameG).get_attribute(tokenList.get(index).tok) == null) {
+                    	//report_error("CODE: 99 [ERROR] This attribute name already exists.");
+                    	//break;
+                    //}
+
+                attributeNameG = tokenList.get(index).tok;
+
+                index++;
+                if (!Objects.equals(tokenList.get(index).tok, "<") && !Objects.equals(tokenList.get(index).tok, ">") && !Objects.equals(tokenList.get(index).tok, "<>") && !Objects.equals(tokenList.get(index).tok, "<=") && !Objects.equals(tokenList.get(index).tok, ">=") && !Objects.equals(tokenList.get(index).tok, "=")) {
+                    report_error("CODE: 98 [ERROR] missing an operator.");
+                    //break;//16;
+                }
+
+                index++;
+                valueNameG = tokenList.get(index).tok;
+
+                index++;
+                if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                    report_error("CODE: 98-2 [ERROR] missing semicolon.");
+                    //break;//16;
+                }
+
+                debug("ACCEPT");
+                debug("The first operand is: " + firstOperand);
+                debug("The operator is: " + actions);
+                debug("The second operand is: " + secondOperand);
+                //16
+                //databaseDataManipulationManager.table_update(tableNameG, attributes, firstOperand, actions,secondOperand,attributeNameG,valueNameG);//16
+                reset_global_storage();
+            }
+
+        } else if (s.equals("SAVE") || s.equals("COMMIT")) {
+            index++;
+            debug("^^^ 106commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                report_error("CODE: 107 [ERROR] Where is the semicolon ");
+                //break;//16;
+            }
+
+            debug("ACCEPT");
+            //databaseManager.save_database(database);//16
+
+        } else if (s.equals("LOAD")) {
+            index++;
+            debug("^^^ 108commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, "DATABASE")) {
+                report_error("CODE: 112 [ERROR] This should be the key word DATABASE after LOAD.");
+            }
+
+            index += 2;
+            debug("^^^ 110commandList: " + tokenList.get(index).tok);
+            if (!Objects.equals(tokenList.get(index).tok, ";")) {
+                report_error("CODE: 111 [ERROR] This should be a semicolon and end of statment.");
+                //break;//16;
+            }
+
+            debug("ACCEPT");
+            //database = databaseManager.get_database(tokenList.get(index-1).tok);//16
+            //databaseDataDefinitionManager = new DatabaseDataDefinitionManager(database);//16
+            //databaseDataManipulationManager = new DatabaseDataManipulationManager(database);//16
+            //databaseWDataManipulationManager = new DatabaseDataWManipulationManager(database);//16
+
+        }*/ else {
+            report_error("CODE: 113 [ERROR] wrong first key word.");
+
         }
     }
     
