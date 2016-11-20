@@ -1,0 +1,6 @@
+http://www.tutorialspoint.com/xsd/
+
+===============================================
+Convrters
+https://jaxb.java.net/jaxb20-ea3/docs/xjcTask.html
+http://www.c-sharpcorner.com/UploadFile/5fd9bd/generation-of-xml-xsd-dtd-with-java/
