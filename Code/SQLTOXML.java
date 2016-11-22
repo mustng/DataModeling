@@ -1,46 +1,59 @@
-import java.util.Scanner;   //antler or javacompilercompiler
+import java.util.Scanner;  
 
-public class Core {
+public class SQLTOXML {
 	
 	
 	public static void main(String args[]) {
 		
 		String options[] = { 
-				"Change to XML(DTD)",
-				"Change to XML(XSD)",
-				"Something about compression"
-			};
-		
-		String optionsExit[] = { 
-				"Continue",
+				"Enter SQL to Convert",
+				"Enter File Name",
+				"Create and View a DTD File",
+				"Create and View a XSD File",
+				"Create and View a XML File",
 				"Exit the Program"
 			};
+		
+//		String optionsExit[] = { 
+//				"Continue",
+//				"Exit the Program"
+//			};
 		
 		@SuppressWarnings("resource")
 		Scanner queryInput = new Scanner(System.in);
 		
 		String currentInput = "";
+		String query = "";
 		
 		System.out.println("Welcome to XML Maker");
 		
 		while (!currentInput.equals("Exit the Program")){
 			
-			System.out.println("Please enter the query you wish to execute");
-			String query = queryInput.nextLine();
-			
-			Parse.checkParse(query);
-			
 			DisplayMenu(options);
 			currentInput = options[getData(options) - 1];
 			
-			if (currentInput.equals("Change to XML(DTD)")){
-				System.out.println("The File has been saved as DTD\n");
+			if (currentInput.equals("Enter SQL to Convert")){
+				System.out.println("Please enter the query you wish to execute");
+				query = queryInput.nextLine();
+//				Parse.checkParse(query);
 			}
-			else if (currentInput.equals("Change to XML(XSD)")){
-				System.out.println("The File has been saved as XSD\n");
+			else if (query.equals("")){
+				System.out.println("\nSorry Please Select \n");
 			}
-			DisplayMenu(optionsExit);
-			currentInput = optionsExit[getData(optionsExit) - 1];
+			else if (currentInput.equals("Enter File Name")){
+				System.out.println("Enter File Name\n");
+			}
+			else if (currentInput.equals("Create and View a DTD File")){
+				System.out.println("Create and View a DTD File\n");
+			}
+			else if (currentInput.equals("Create and View a XSD File")){
+				System.out.println("Create and View a XSD File\n");
+			}
+			else if (currentInput.equals("Create and View a XML File")){
+				System.out.println("Create and View a XML File\n");
+			}
+//			DisplayMenu(optionsExit);
+//			currentInput = optionsExit[getData(optionsExit) - 1];
 		}
 	}
 	

@@ -35,7 +35,7 @@ public class CREATEXML {
 		int k = 0;
 		   for(int i = 1; i < tableData.size();i++){
 			   printOut += xmlLines.get(0) + "\n";
-			   System.out.println(xmlLines.get(0));
+//			   System.out.println(xmlLines.get(0));
 			   
 		        for(int j = 0; j < ((ArrayList)tableData.get(i)).size(); j++){
 		        	if (k + 2 > xmlLines.size() - 1){
@@ -43,31 +43,31 @@ public class CREATEXML {
 		        	}
 		        	if (xmlLines.get(k + 2).contains("@")){
 		        		printOut += xmlLines.get(k + 2).replace("@", "") + "\n";
-		        		System.out.println(xmlLines.get(k + 2).replace("@", ""));
+//		        		System.out.println(xmlLines.get(k + 2).replace("@", ""));
 		        		k++;
 						j--;
 					}
 		        	else if (xmlLines.get(k + 2).contains("~")){
 		        		printOut += xmlLines.get(k + 2).replace("~", "") + "\n";;
-		        		System.out.println(xmlLines.get(k + 2).replace("~", ""));
+//		        		System.out.println(xmlLines.get(k + 2).replace("~", ""));
 		        		k++;
 						j--;
 					}
 		        	else{
 		        		k+=2;
 		        		printOut += xmlLines.get(k) + ((ArrayList)tableData.get(i)).get(j) + xmlLines.get(k + 1) + "\n";
-		        		System.out.println(xmlLines.get(k) + ((ArrayList)tableData.get(i)).get(j) + xmlLines.get(k + 1));
+//		        		System.out.println(xmlLines.get(k) + ((ArrayList)tableData.get(i)).get(j) + xmlLines.get(k + 1));
 		        		
 		        		if(k  + 2 <xmlLines.size() && xmlLines.get(k + 2).contains("~")){
 		        			printOut += xmlLines.get(k + 2).replace("~", "") + "\n";;
-			        		System.out.println(xmlLines.get(k + 2).replace("~", ""));
+//			        		System.out.println(xmlLines.get(k + 2).replace("~", ""));
 			        		k++;
 		        		}
 		        		
 		        	}
 		        }
 	       printOut += xmlLines.get(1) + "\n";
-	       System.out.println(xmlLines.get(1));
+//	       System.out.println(xmlLines.get(1));
 		   }
 		
 		System.out.println(printOut);
@@ -89,12 +89,12 @@ public class CREATEXML {
 				i+=2;
 			}
 			else if(tableInfo.get(i).contains("<")){
-				xmlLines.add("@" + tabMaker(tagNameDepthCount) + tableInfo.get(i) + ">");
+				xmlLines.add("@" + tabMaker(tagNameDepthCount) + tableInfo.get(i).replace(" ", "") + ">");
 				tagNameDepthCount++;
 			}
 			else if(tableInfo.get(i).contains(">")){
 				tagNameDepthCount--;
-				xmlLines.add("~" + tabMaker(tagNameDepthCount) + "</" + tableInfo.get(i));
+				xmlLines.add("~" + tabMaker(tagNameDepthCount) + "</" + tableInfo.get(i).replace(" ", ""));
 			}
 			else{
 				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + tableInfo.get(i) + "   table=\"" + tableInfo.get(0) + "\" name=\"" + tableInfo.get(i) + "\">");
