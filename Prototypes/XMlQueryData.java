@@ -44,6 +44,7 @@ public class XMlQueryData {
         while( res.next() ) {
         	for (int i = 1; i < getAttributes.size(); i++){
         		((ArrayList<String>)tableData.get(j)).add(res.getString(i));
+
         	}
         	tableData.add(new ArrayList());
         	j++;

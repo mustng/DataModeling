@@ -37,3 +37,9 @@ Purpose: Continue progress of non complete pieces and run over more rules
 - Samuel Gost
 - David Hughes
 - Logan McManus
+
+========
+11/23/16
+Purpose: Work on what it would take to combine all the prototypes together
+- Samuel Gost
+- David Hughes
