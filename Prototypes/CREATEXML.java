@@ -4,6 +4,7 @@ import java.util.ArrayList;
 public class CREATEXML {
 	
 	public static void main(String args[]) {
+		String filename = "SomeFile";
 		
 		ArrayList<String> tableInfo = new ArrayList<String>();
 		ArrayList<String> xmlLines = new ArrayList<String>();
@@ -16,12 +17,10 @@ public class CREATEXML {
 		tableInfo.add("AS");
 		tableInfo.add("ID");
 		tableInfo.add("< tagname");
-		tableInfo.add("SNAME");
+		tableInfo.add("C.SNAME");
 		tableInfo.add("tagname >");
 		tableInfo.add("QUOTA");
-		tableInfo.add("< tagname");
 		tableInfo.add("CITY");
-		tableInfo.add("tagname >");
 		
 		try {
 			runQuery(tableData); //fetch sql query
@@ -29,7 +28,8 @@ public class CREATEXML {
 			System.out.println("Issue with connection");
 		}
 		
-		String printOut = ""; 
+		String printOut = "<?xml ve rsion = \"1.0\"?>\n<!DOCTYPE Faculty INFORMATION \"" 
+				+ filename + ".dtd\">\n\n"; 
 		xmlLines(xmlLines , tableInfo);
 		
 		int k = 0;
@@ -76,16 +76,38 @@ public class CREATEXML {
 	public static ArrayList<String> xmlLines (ArrayList<String> xmlLines, ArrayList<String> tableInfo){  //This creates the lines going into the code 
 																										// example <ID   table="Animals" name="ID"> and </ID>
 		int tagNameDepthCount = 1;
+		String mainTable = "";
+		if (tableInfo.get(0).contains(",")){						//check for the main table
+			String[] splitTableName = tableInfo.get(0).split(",");
+			mainTable += splitTableName[0].replace(" ", "");
+		}
+		else{
+			mainTable += tableInfo.get(0);
+		}
 		
 		for (int i = 0; i < tableInfo.size() ; i++){	
 			
 			if(i == 0){
-				xmlLines.add("<" + tableInfo.get(0) + ">");
-				xmlLines.add("</" + tableInfo.get(0) + ">");
+				xmlLines.add("<" + mainTable + ">");
+				xmlLines.add("</" + mainTable + ">");
 			}
-			else if(i != tableInfo.size() - 1 && tableInfo.get(i + 1).equals("AS")){
-				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + tableInfo.get(i + 2) + "   table=\"" + tableInfo.get(0) + "\" name=\"" + tableInfo.get(i) + "\">");
-				xmlLines.add("</" + tableInfo.get(i + 2) + ">");
+			else if(i != tableInfo.size() - 1 && tableInfo.get(i + 1).toUpperCase().equals("AS")){
+				String[] leftOfAS = new String[10];
+				String[] rightOfAs = new String[10];
+				if (tableInfo.get(i).contains(".")){
+					leftOfAS = tableInfo.get(i).split("\\.");
+				}
+				else{
+					leftOfAS[1] = tableInfo.get(i);
+				}
+				if(tableInfo.get(i + 2).contains(".")){
+					rightOfAs = tableInfo.get(i + 2).split("\\.");
+				}
+				else{
+					rightOfAs[1] = tableInfo.get(i + 2);;
+				}
+				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + rightOfAs[1].replace(" ", "") + "   table=\"" + mainTable + "\" name=\"" + leftOfAS[1].replace(" ", "") + "\">");
+				xmlLines.add("</" + rightOfAs[1].replace(" ", "") + ">");
 				i+=2;
 			}
 			else if(tableInfo.get(i).contains("<")){
@@ -96,8 +118,13 @@ public class CREATEXML {
 				tagNameDepthCount--;
 				xmlLines.add("~" + tabMaker(tagNameDepthCount) + "</" + tableInfo.get(i).replace(" ", ""));
 			}
+			else if(tableInfo.get(i).contains(".")){
+				String[] table = tableInfo.get(i).split("\\."); 
+				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + table[1] + "   table=\"" + table[0] + "\" name=\"" + table[1] + "\">");
+				xmlLines.add("</" + table[1] + ">");
+			}
 			else{
-				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + tableInfo.get(i) + "   table=\"" + tableInfo.get(0) + "\" name=\"" + tableInfo.get(i) + "\">");
+				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + tableInfo.get(i) + "   table=\"" + mainTable + "\" name=\"" + tableInfo.get(i) + "\">");
 				xmlLines.add("</" + tableInfo.get(i) + ">");
 			}
 			
