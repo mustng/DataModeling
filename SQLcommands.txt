@@ -1,0 +1,26 @@
+CREATE TABLE ORDERS(
+	SNO VARCHAR2(2) NOT NULL,
+	PNO VARCHAR2(2) NOT NULL,
+	CNO VARCHAR2(2) NOT NULL,
+	TOTQTY INT,
+	FOREIGN KEY (SNO) REFERENCES S(SNO),
+	FOREIGN KEY (PNO) REFERENCES P(PNO),
+	FOREIGN KEY (CNO) REFERENCES C(CNO));
+
+insert into Orders Values('S1','P1','C5', 4);
+insert into Orders Values('S1','P3','C5', 2);
+insert into Orders Values('S1','P3','C1', 1);
+insert into Orders Values('S2','P1','C1', 2);
+insert into Orders Values('S2','P4','C4', 5);
+insert into Orders Values('S2','P2','C4', 5);
+insert into Orders Values('S2','P3','C4', 5);
+insert into Orders Values('S3','P5','C4', 5);
+insert into Orders Values('S3','P6','C4', 2);
+insert into Orders Values('S5','P2','C2', 10);
+insert into Orders Values('S5','P4','C2', 10);
+insert into Orders Values('S5','P5','C2', 10);
+insert into Orders Values('S5','P6','C2', 2);
+insert into Orders Values('S5','P5','C3', 3);
+insert into Orders Values('S5','P3','C3', 3);
+
+
