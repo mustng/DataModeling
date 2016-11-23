@@ -27,6 +27,8 @@ public class DTD {
 		
 		String printOut = "";
 		
+		
+		cleanArray(tableInfo);
 		dtdSideBar(dtdLines,tableInfo);	 //Creates side bar
 		for (int i  = 0; i < dtdLines.size(); i++){
 			printOut += dtdLines.get(i) + "\n";
@@ -53,6 +55,34 @@ public class DTD {
 		dtdLines.add(" ");
 		
 		return dtdLines;
+	}
+	
+	public static ArrayList<String> cleanArray(ArrayList<String> input){
+		
+		if (input.get(0).contains(",")){						//check for the main table
+			
+			String[] splitTableName = input.get(0).split(",");
+			input.set(0, splitTableName[0].replace(" ", ""));
+			
+	
+		}
+		for(int i = 1; i < input.size(); i++){
+			
+			if(input.get(i).contains("<") || input.get(i).contains(">") || input.get(i).toUpperCase().contains("AS")){
+				
+				input.remove(i);
+				i--;
+				
+			} 
+			else if(input.get(i).contains(".")){
+				
+				String[] splitWord = input.get(i).split("\\.");
+				input.set(i, splitWord[splitWord.length - 1]);
+			}
+			
+		}
+//		System.out.println(input);
+		return input;
 	}
 	
 }
