@@ -13,7 +13,7 @@ public class SQLTOXML {
 		tableInfo.add("S . SNO");
 		tableInfo.add("AS");
 		tableInfo.add("C . ID");
-		tableInfo.add("< + tagname");
+		tableInfo.add("< tagname");
 		tableInfo.add("< tagname");
 		tableInfo.add("C . SNAME");
 		tableInfo.add("tagname >");
@@ -40,6 +40,7 @@ public class SQLTOXML {
 		
 		@SuppressWarnings("resource")
 		Scanner queryInput = new Scanner(System.in);
+		@SuppressWarnings("resource")
 		Scanner file = new Scanner(System.in);
 		
 		String currentInput = "";
@@ -64,6 +65,7 @@ public class SQLTOXML {
 				if (currentInput.equals("Yes")){
 					System.out.println("Please enter the name you wish to call your file");
 					fileName = file.nextLine();
+					XMLMaker.setFileName(fileName);
 					System.out.println("The file will be saved as \"" + fileName + "\" in the same directory of this file");
 				}
 				else if (currentInput.equals("No")){
@@ -76,19 +78,20 @@ public class SQLTOXML {
 					currentInput = options[getData(options) - 1];
 					
 					if (currentInput.equals("Create and View a DTD File")){
-						System.out.println("Create and View a DTD File\n");
+						XMLMaker.DTD(tableInfo);
 					}
 					else if (currentInput.equals("Create and View a XSD File")){
-						System.out.println("Create and View a XSD File\n");
+						XMLMaker.generateXSD(tableInfo);
 					}
 					else if (currentInput.equals("Create and View a XML File")){
-						System.out.println("Create and View a XML File\n");
+						XMLMaker.XML(tableInfo);
 					}
 				
 				}
 			}
 			DisplayMenu(tryAgain);
 			currentInput = tryAgain[getData(tryAgain) - 1];
+			XMLMaker.resetFileName();
 		}
 	}
 	
@@ -124,4 +127,5 @@ public class SQLTOXML {
 			System.out.println(uiNumber + " - " + options[index]);
 		}
 	}
+	
 }
