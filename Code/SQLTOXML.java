@@ -1,59 +1,94 @@
+import java.util.ArrayList;
 import java.util.Scanner;  
 
 public class SQLTOXML {
 	
 	
+	private static ArrayList<String> tableInfo = new ArrayList<String>();
+	
+	
 	public static void main(String args[]) {
 		
-		String options[] = { 
-				"Enter SQL to Convert",
-				"Enter File Name",
-				"Create and View a DTD File",
-				"Create and View a XSD File",
-				"Create and View a XML File",
+		tableInfo.add("S , C"); 
+		tableInfo.add("S . SNO");
+		tableInfo.add("AS");
+		tableInfo.add("C . ID");
+		tableInfo.add("< + tagname");
+		tableInfo.add("< tagname");
+		tableInfo.add("C . SNAME");
+		tableInfo.add("tagname >");
+		tableInfo.add("tagname >");
+		tableInfo.add("QUOTA");
+		tableInfo.add("CITY");
+		
+		String tryAgain[] = { 
+				"Run Another Query",
 				"Exit the Program"
 			};
 		
-//		String optionsExit[] = { 
-//				"Continue",
-//				"Exit the Program"
-//			};
+		String yesOrNo[] = { 
+				"Yes",
+				"No"
+			};
+		
+		String options[] = { 
+				"Create and View a DTD File",
+				"Create and View a XSD File",
+				"Create and View a XML File",
+				"Exit the Displayer"
+			};
 		
 		@SuppressWarnings("resource")
 		Scanner queryInput = new Scanner(System.in);
+		Scanner file = new Scanner(System.in);
 		
 		String currentInput = "";
 		String query = "";
+		String fileName ="";
 		
 		System.out.println("Welcome to XML Maker");
 		
 		while (!currentInput.equals("Exit the Program")){
 			
-			DisplayMenu(options);
-			currentInput = options[getData(options) - 1];
-			
-			if (currentInput.equals("Enter SQL to Convert")){
-				System.out.println("Please enter the query you wish to execute");
-				query = queryInput.nextLine();
-//				Parse.checkParse(query);
+			System.out.println("Please enter the query you wish to execute");
+			query = queryInput.nextLine();
+//			Parse.checkParse(query);
+			if (tableInfo.size() == 0){
+				//do nothing reset
 			}
-			else if (query.equals("")){
-				System.out.println("\nSorry Please Select \n");
+			else{
+				System.out.println("Would you like to save the file to the hard disk?");
+				DisplayMenu(yesOrNo);
+				
+				currentInput = yesOrNo[getData(yesOrNo) - 1];
+				if (currentInput.equals("Yes")){
+					System.out.println("Please enter the name you wish to call your file");
+					fileName = file.nextLine();
+					System.out.println("The file will be saved as \"" + fileName + "\" in the same directory of this file");
+				}
+				else if (currentInput.equals("No")){
+					fileName = "MyXML";
+					System.out.println("No file will be written just displayed");
+				} 
+				
+				while(!currentInput.equals("Exit the Displayer")){
+					DisplayMenu(options);
+					currentInput = options[getData(options) - 1];
+					
+					if (currentInput.equals("Create and View a DTD File")){
+						System.out.println("Create and View a DTD File\n");
+					}
+					else if (currentInput.equals("Create and View a XSD File")){
+						System.out.println("Create and View a XSD File\n");
+					}
+					else if (currentInput.equals("Create and View a XML File")){
+						System.out.println("Create and View a XML File\n");
+					}
+				
+				}
 			}
-			else if (currentInput.equals("Enter File Name")){
-				System.out.println("Enter File Name\n");
-			}
-			else if (currentInput.equals("Create and View a DTD File")){
-				System.out.println("Create and View a DTD File\n");
-			}
-			else if (currentInput.equals("Create and View a XSD File")){
-				System.out.println("Create and View a XSD File\n");
-			}
-			else if (currentInput.equals("Create and View a XML File")){
-				System.out.println("Create and View a XML File\n");
-			}
-//			DisplayMenu(optionsExit);
-//			currentInput = optionsExit[getData(optionsExit) - 1];
+			DisplayMenu(tryAgain);
+			currentInput = tryAgain[getData(tryAgain) - 1];
 		}
 	}
 	
