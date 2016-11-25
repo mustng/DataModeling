@@ -1,42 +1,48 @@
-package Prototypes;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class CREATEXML {
 	
 	public static void main(String args[]) {
-		
 		ArrayList<String> tableInfo = new ArrayList<String>();
-		ArrayList<String> xmlLines = new ArrayList<String>();
 		
-		ArrayList<ArrayList<?>> tableData = new ArrayList<ArrayList<?>>();
-		tableData.add(new ArrayList());
-		
-		tableInfo.add("S"); 
-		tableInfo.add("SNO");
+		tableInfo.add("S , C"); 
+		tableInfo.add("S . SNO");
 		tableInfo.add("AS");
-		tableInfo.add("ID");
+		tableInfo.add("C . ID");
 		tableInfo.add("< tagname");
-		tableInfo.add("SNAME");
+		tableInfo.add("< tagname");
+		tableInfo.add("C . SNAME");
+		tableInfo.add("tagname >");
 		tableInfo.add("tagname >");
 		tableInfo.add("QUOTA");
-		tableInfo.add("< tagname");
 		tableInfo.add("CITY");
-		tableInfo.add("tagname >");
+		
+		XML(tableInfo);
+		
+	}
+	
+	public static void XML(ArrayList<String> tableInfo ){
+		String filename = "HelloWorld";
+		
+		ArrayList<String> xmlLines = new ArrayList<String>();
+		ArrayList<ArrayList<?>> tableData = new ArrayList<ArrayList<?>>();
+		
+		tableData.add(new ArrayList());   //must have for it to load array
 		
 		try {
-			runQuery(tableData); //fetch sql query
+			runQuery(tableData, tableInfo); //fetch sql query
 		} catch (SQLException e) {
 			System.out.println("Issue with connection");
 		}
 		
-		String printOut = ""; 
+		if (tableInfo.get(0).contains(",")){						//check for the main table
+			String[] splitTableName = tableInfo.get(0).split(",");
+			tableInfo.set(0, splitTableName[0].replace(" ", ""));
+		}
+		
+		String printOut = "<?xml ve rsion = \"1.0\"?>\n<!DOCTYPE " + tableInfo.get(0) + " INFORMATION \"" 
+				+ filename + ".dtd\">\n\n"; 
 		xmlLines(xmlLines , tableInfo);
 		
 		int k = 0;
@@ -44,7 +50,7 @@ public class CREATEXML {
 			   printOut += xmlLines.get(0) + "\n";
 //			   System.out.println(xmlLines.get(0));
 			   
-		        for(int j = 0; j < ((ArrayList)tableData.get(i)).size(); j++){
+		        for(int j = 0; j < ((ArrayList<?>)tableData.get(i)).size(); j++){
 		        	if (k + 2 > xmlLines.size() - 1){
 		        		k = 0;
 		        	}
@@ -62,7 +68,7 @@ public class CREATEXML {
 					}
 		        	else{
 		        		k+=2;
-		        		printOut += xmlLines.get(k) + ((ArrayList)tableData.get(i)).get(j) + xmlLines.get(k + 1) + "\n";
+		        		printOut += xmlLines.get(k) + ((ArrayList<?>)tableData.get(i)).get(j) + xmlLines.get(k + 1) + "\n";
 //		        		System.out.println(xmlLines.get(k) + ((ArrayList)tableData.get(i)).get(j) + xmlLines.get(k + 1));
 		        		
 		        		if(k  + 2 <xmlLines.size() && xmlLines.get(k + 2).contains("~")){
@@ -76,10 +82,13 @@ public class CREATEXML {
 	       printOut += xmlLines.get(1) + "\n";
 //	       System.out.println(xmlLines.get(1));
 		   }
-		//Creates a file in the current working directory with name test.txt, and content from printOut, 
-		createFile(printOut, "test.txt");
+		
+//		if (nameFile){
+//			createFile(printOut, filename += ".xml");
+//		}
 		System.out.println(printOut);
 	}
+	
 	
 	public static ArrayList<String> xmlLines (ArrayList<String> xmlLines, ArrayList<String> tableInfo){  //This creates the lines going into the code 
 																										// example <ID   table="Animals" name="ID"> and </ID>
@@ -91,9 +100,23 @@ public class CREATEXML {
 				xmlLines.add("<" + tableInfo.get(0) + ">");
 				xmlLines.add("</" + tableInfo.get(0) + ">");
 			}
-			else if(i != tableInfo.size() - 1 && tableInfo.get(i + 1).equals("AS")){
-				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + tableInfo.get(i + 2) + "   table=\"" + tableInfo.get(0) + "\" name=\"" + tableInfo.get(i) + "\">");
-				xmlLines.add("</" + tableInfo.get(i + 2) + ">");
+			else if(i != tableInfo.size() - 1 && tableInfo.get(i + 1).toUpperCase().contains("AS")){
+				String[] leftOfAS = new String[10];
+				String[] rightOfAs = new String[10];
+				if (tableInfo.get(i).contains(".")){
+					leftOfAS = tableInfo.get(i).split("\\.");
+				}
+				else{
+					leftOfAS[1] = tableInfo.get(i);
+				}
+				if(tableInfo.get(i + 2).contains(".")){
+					rightOfAs = tableInfo.get(i + 2).split("\\.");
+				}
+				else{
+					rightOfAs[1] = tableInfo.get(i + 2);;
+				}
+				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + rightOfAs[1].replace(" ", "") + "   table=\"" + tableInfo.get(0) + "\" name=\"" + leftOfAS[1].replace(" ", "") + "\">");
+				xmlLines.add("</" + rightOfAs[1].replace(" ", "") + ">");
 				i+=2;
 			}
 			else if(tableInfo.get(i).contains("<")){
@@ -103,6 +126,11 @@ public class CREATEXML {
 			else if(tableInfo.get(i).contains(">")){
 				tagNameDepthCount--;
 				xmlLines.add("~" + tabMaker(tagNameDepthCount) + "</" + tableInfo.get(i).replace(" ", ""));
+			}
+			else if(tableInfo.get(i).contains(".")){
+				String[] table = tableInfo.get(i).split("\\."); 
+				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + table[1] + "   table=\"" + table[0] + "\" name=\"" + table[1] + "\">");
+				xmlLines.add("</" + table[1] + ">");
 			}
 			else{
 				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + tableInfo.get(i) + "   table=\"" + tableInfo.get(0) + "\" name=\"" + tableInfo.get(i) + "\">");
@@ -122,35 +150,36 @@ public class CREATEXML {
 		return space;
 	}
 	
+	
 	@SuppressWarnings("unchecked")
-	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData) throws SQLException {
+	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
 		
 		tableData.add(new ArrayList());
 	      
-	      ((ArrayList)tableData.get(1)).add("S1");
-	      ((ArrayList)tableData.get(1)).add("Adams");
-	      ((ArrayList)tableData.get(1)).add("3000");
-	      ((ArrayList)tableData.get(1)).add("Dallas");
+	      ((ArrayList<String>)tableData.get(1)).add("S1");
+	      ((ArrayList<String>)tableData.get(1)).add("Adams");
+	      ((ArrayList<String>)tableData.get(1)).add("3000");
+	      ((ArrayList<String>)tableData.get(1)).add("Dallas");
 	      tableData.add(new ArrayList());
-	      ((ArrayList)tableData.get(2)).add("S2");
-	      ((ArrayList)tableData.get(2)).add("Smith");
-	      ((ArrayList)tableData.get(2)).add("10000");
-	      ((ArrayList)tableData.get(2)).add("Chicago");
+	      ((ArrayList<String>)tableData.get(2)).add("S2");
+	      ((ArrayList<String>)tableData.get(2)).add("Smith");
+	      ((ArrayList<String>)tableData.get(2)).add("10000");
+	      ((ArrayList<String>)tableData.get(2)).add("Chicago");
 	      tableData.add(new ArrayList());
-	      ((ArrayList)tableData.get(3)).add("S3");
-	      ((ArrayList)tableData.get(3)).add("Jones");
-	      ((ArrayList)tableData.get(3)).add("7500");
-	      ((ArrayList)tableData.get(3)).add("Phoenix");
+	      ((ArrayList<String>)tableData.get(3)).add("S3");
+	      ((ArrayList<String>)tableData.get(3)).add("Jones");
+	      ((ArrayList<String>)tableData.get(3)).add("7500");
+	      ((ArrayList<String>)tableData.get(3)).add("Phoenix");
 	      tableData.add(new ArrayList());
-	      ((ArrayList)tableData.get(4)).add("S4");
-	      ((ArrayList)tableData.get(4)).add("Knapp");
-	      ((ArrayList)tableData.get(4)).add("13000");
-	      ((ArrayList)tableData.get(4)).add("San Diego");
+	      ((ArrayList<String>)tableData.get(4)).add("S4");
+	      ((ArrayList<String>)tableData.get(4)).add("Knapp");
+	      ((ArrayList<String>)tableData.get(4)).add("13000");
+	      ((ArrayList<String>)tableData.get(4)).add("San Diego");
 	      tableData.add(new ArrayList());
-	      ((ArrayList)tableData.get(5)).add("S5");
-	      ((ArrayList)tableData.get(5)).add("Martin");
-	      ((ArrayList)tableData.get(5)).add("25000");
-	      ((ArrayList)tableData.get(5)).add("New York");
+	      ((ArrayList<String>)tableData.get(5)).add("S5");
+	      ((ArrayList<String>)tableData.get(5)).add("Martin");
+	      ((ArrayList<String>)tableData.get(5)).add("25000");
+	      ((ArrayList<String>)tableData.get(5)).add("New York");
 	      
 //	      for(int i = 0; i < tableData.size();i++){
 //	          for(int j = 0; j < ((ArrayList)tableData.get(i)).size(); j++){
@@ -161,16 +190,4 @@ public class CREATEXML {
         
         return tableData;
     }
-	
-	public static void createFile(String info, String name){
-		
-		Charset utf8 = StandardCharsets.UTF_8;
-		try {
-		    
-		    Files.write(Paths.get(name), info.getBytes(utf8));
-	
-		} catch (IOException e) {
-		    e.printStackTrace();
-		}
-}
 }
