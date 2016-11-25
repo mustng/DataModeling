@@ -60,12 +60,18 @@ public static ArrayList<String> cleanArray(ArrayList<String> input){
 		}
 		for(int i = 1; i < input.size(); i++){
 			
-			if(input.get(i).contains("<") || input.get(i).contains(">") || input.get(i).toUpperCase().contains("AS")){
+			if(input.get(i).contains("<") || input.get(i).contains(">")){
 				
 				input.remove(i);
 				i--;
 				
 			} 
+			else if (input.get(i).toUpperCase().contains("AS")){
+				input.remove(i + 1);
+				i--;
+				input.remove(i + 1);
+				i--;
+			}
 			else if(input.get(i).contains(".")){
 				
 				String[] splitWord = input.get(i).split("\\.");

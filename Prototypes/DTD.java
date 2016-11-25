@@ -60,7 +60,7 @@ public class DTD {
 		return dtdLines;
 	}
 	
-	public static ArrayList<String> cleanArray(ArrayList<String> input){
+public static ArrayList<String> cleanArray(ArrayList<String> input){
 		
 		if (input.get(0).contains(",")){						//check for the main table
 			
@@ -71,12 +71,18 @@ public class DTD {
 		}
 		for(int i = 1; i < input.size(); i++){
 			
-			if(input.get(i).contains("<") || input.get(i).contains(">") || input.get(i).toUpperCase().contains("AS")){
+			if(input.get(i).contains("<") || input.get(i).contains(">")){
 				
 				input.remove(i);
 				i--;
 				
 			} 
+			else if (input.get(i).toUpperCase().contains("AS")){
+				input.remove(i + 1);
+				i--;
+				input.remove(i + 1);
+				i--;
+			}
 			else if(input.get(i).contains(".")){
 				
 				String[] splitWord = input.get(i).split("\\.");

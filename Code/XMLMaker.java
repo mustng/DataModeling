@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.sql.*;
 
 public class XMLMaker {
@@ -83,7 +82,7 @@ public class XMLMaker {
 		return dtdLines;
 	}
 	
-	public static ArrayList<String> cleanArray(ArrayList<String> input){
+public static ArrayList<String> cleanArray(ArrayList<String> input){
 		
 		if (input.get(0).contains(",")){						//check for the main table
 			
@@ -94,12 +93,18 @@ public class XMLMaker {
 		}
 		for(int i = 1; i < input.size(); i++){
 			
-			if(input.get(i).contains("<") || input.get(i).contains(">") || input.get(i).toUpperCase().contains("AS")){
+			if(input.get(i).contains("<") || input.get(i).contains(">")){
 				
 				input.remove(i);
 				i--;
 				
 			} 
+			else if (input.get(i).toUpperCase().contains("AS")){
+				input.remove(i + 1);
+				i--;
+				input.remove(i + 1);
+				i--;
+			}
 			else if(input.get(i).contains(".")){
 				
 				String[] splitWord = input.get(i).split("\\.");
@@ -292,7 +297,7 @@ public class XMLMaker {
         stmt.close();
         return tableData;
     }
-	
+//	
 //	@SuppressWarnings("unchecked")
 //	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
 //		
