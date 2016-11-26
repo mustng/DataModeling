@@ -67,7 +67,7 @@ public class Cleaner
     public String dataTypeConv(String dataType)
     {
         dataType.toLowerCase();
-        if (dataType.matches("(character|varchar|character varying|)(.*)"))
+        if (dataType.matches("(character|varchar|character varying)(.*)"))
             return "string";
         else if (dataType.matches("boolean"))
             return "boolean";

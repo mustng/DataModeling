@@ -63,7 +63,7 @@ public class Compiler
 
 
 
-    public static void main(String[] args) throws IOException
+   static ArrayList<String> compiler(ArrayList<String> finalList)
 
 
     {
@@ -130,6 +130,7 @@ public class Compiler
         tokens.add("'");
         tokens.add(".");
 
+        
         /*End of adding the Keywords, Symbols or Tokens in the langauge*/
 
         boolean value = true;                                                               //Flag to execute a user interactive menu
@@ -138,11 +139,12 @@ public class Compiler
         while (value == true && stop == false)
         {
             value = menu();
-            reset();//16
+//            reset();//16
             debug("");
         }
-
-
+        
+        System.out.println(tableNames);
+        return tableNames;
     }
     public static boolean menu()
     {
@@ -195,7 +197,7 @@ public class Compiler
         //newAttributeNames.clear();
         tagNames.clear();
         //taggedAttributes.clear();
-        finalList.clear();
+//        finalList.clear();
         lineEntered = "";
         dotSpacer = true;
     }
