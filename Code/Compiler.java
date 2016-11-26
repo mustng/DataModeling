@@ -26,7 +26,18 @@ public class Compiler
 
 	public static final boolean DEBUG = true;
 	public static final boolean REPORT_ERROR = true;
-	
+
+    public static ArrayList<String> originalList = new ArrayList<String>();
+    public static ArrayList<String> tableNames = new ArrayList<String>();
+    public static ArrayList<String> finalList = new ArrayList<String>();
+    public static ArrayList<String> originalAttributeNames = new ArrayList<String>();
+    public static ArrayList<String> newAttributeNames = new ArrayList<String>();
+    public static ArrayList<String> tagNames = new ArrayList<String>();
+    public static ArrayList<String> taggedAttributes = new ArrayList<String>();
+    public static String lineEntered  = "";
+    public static boolean stop = false;
+    public static boolean dotSpacer = true;
+    public static boolean correctSql = true;
     public static ArrayList<Token> tokenList = new ArrayList<Token>();                              //The token list for parsing and semantics
     public static String lineInput = "";                                                            //Stores the queries for scanning, parsing, and semantics
     public static ArrayList<String> operator = new ArrayList<String>();                             //Used for the compare method
@@ -48,6 +59,9 @@ public class Compiler
     public static int tempDistinct = 0;
 
     public static long total = 0;
+
+
+
 
     public static void main(String[] args) throws IOException
 
@@ -114,13 +128,14 @@ public class Compiler
         tokens.add(")");
         tokens.add(":");
         tokens.add("'");
+        tokens.add(".");
 
         /*End of adding the Keywords, Symbols or Tokens in the langauge*/
 
         boolean value = true;                                                               //Flag to execute a user interactive menu
 
 
-        while (value == true)
+        while (value == true && stop == false)
         {
             value = menu();
             reset();//16
@@ -147,6 +162,8 @@ public class Compiler
 	    debug("");
             debug("Exiting...\n");
             System.exit(0);
+
+
             return false;
         }
 
@@ -172,6 +189,15 @@ public class Compiler
         currToken.type = "";
         index = 0;
         tempDistinct = 0;
+        originalList.clear();
+        correctSql = true;
+        tableNames.clear();
+        //newAttributeNames.clear();
+        tagNames.clear();
+        //taggedAttributes.clear();
+        finalList.clear();
+        lineEntered = "";
+        dotSpacer = true;
     }
 
     public static void scan()
@@ -184,13 +210,30 @@ public class Compiler
             token += a;
 
 
-            if (Character.isUpperCase(a) || Character.isLowerCase(a))                                        //Check if the character is a lowercase or uppercase letter
+
+
+            if (Character.isUpperCase(a) || Character.isLowerCase(a) || a == '_' || (Character.isDigit(a) && Character.isLetter(lineInput.charAt(i-1))) || (Character.isDigit(a) && lineInput.charAt(i-1) == '_'))                                       //Check if the character is a lowercase or uppercase letter
             {
-                ID += a;
-                charFlag = true;
+
+
+                if(ID.length() >= 1){
+                    if(Character.isLetter(ID.charAt(0))){
+                        //firstIsLetter = false;
+                        ID += a;
+                        charFlag = true;
+                    }
+                    else{
+                        charFlag = false;
+                    }
+                }else{
+                    ID += a;
+                    charFlag = true;
+                }
+
+
             }
 
-            else if (Character.isDigit(a) || lineInput.charAt(i) == '.')                                                                   //Check for a decimal inside a number or is a number
+            else if (Character.isDigit(a))                                                                   //Check for a decimal inside a number or is a number
             {
                 num += a;
                 numFlag = true;
@@ -222,6 +265,7 @@ public class Compiler
 
                 Token theToken = new Token("SYMBOL", temp);
                 tokenList.add(theToken);
+                //originalList.add(temp);//20
             }
 
             else if (a == '\n' || a == ' ' || a == '\t' || (i == lineInput.length() - 1))
@@ -260,7 +304,9 @@ public class Compiler
                 break;
             }
 
-            if (charFlag == true && !Character.isLetter(lineInput.charAt(i + 1)))
+
+
+            if (charFlag == true && !Character.isLetterOrDigit(lineInput.charAt(i + 1)) && !Objects.equals(lineInput.charAt(i+1), '_'))
             {
                 String temp = ID;
                 if (keyWord.contains(temp.toUpperCase()))
@@ -288,7 +334,10 @@ public class Compiler
                 numFlag = false;
             }
             i++;                                                                                                        //Increment i to the next position of the string
+
+
         }
+
 
     }
 
@@ -299,14 +348,33 @@ public class Compiler
         errorFlag = true;
     }
 
+    public static void sqlStatement(String singleData){
+        //originalList.add(tokenList.get(index).tok);
+        originalList.add(singleData);
+    }
+
+    public static void sqlLineEntered(String wholeData){
+        if(dotSpacer == false){
+            lineEntered += wholeData;
+        }else {
+            lineEntered += " "+wholeData;
+        }
+    }
+
     public static void CheckToken(String expected, String current)                                                      //Function to check whether the current token is correct
     {
         if (Objects.equals(expected, current))
         {
             //debug("ACCEPTED: " + current);
+            if(correctSql == true) {
+                sqlLineEntered(tokenList.get(index).tok);
+            }
+
             index++;
             currToken = tokenList.get(index);
-            System.out.println(current);
+            //System.out.println(current);
+
+
         }
 
         else if (errorFlag == false && (!Objects.equals(currToken.tok, ";") || createTabFlag == true))
@@ -330,9 +398,17 @@ public class Compiler
 
         if (Objects.equals(currToken.tok, ";") && errorFlag == false && !Objects.equals(tokenList.get(0).tok, ";") && (index == tokenList.size()-1))                                                               //If we finish all the parsing checks then accept on semi colon
         {
+            sqlLineEntered(";");
  	        debug("");
             debug("ACCEPT");
             index = 0;
+            //System.out.print(originalList);
+
+            tableNames.addAll(originalList);
+            tableNames.add(0, lineEntered);
+            System.out.println(tableNames);
+            //for(String thing : originalList)
+                //System.out.print(thing);
             //semantics();
         }
 
@@ -433,6 +509,7 @@ public class Compiler
 
         else if (Objects.equals(currToken.tok, "SELECT"))
         {
+            //correctSql = false;
             CheckToken("SELECT", currToken.tok);
 
             //int next = index + 1;
@@ -633,6 +710,7 @@ public class Compiler
 
         if (Objects.equals(currToken.tok, "*"))
         {
+            sqlStatement(tokenList.get(index).tok);
             CheckToken("*", currToken.tok);
             if(Objects.equals(currToken.tok, "FROM")) {
                 CheckToken("FROM", currToken.tok);
@@ -645,11 +723,14 @@ public class Compiler
         else if(Objects.equals(currToken.tok, "DISTINCT") && tempDistinct == 0){
             CheckToken("DISTINCT", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
-                CheckToken("ID", currToken.type);
+                idFound();
+                //CheckToken("ID", currToken.type);
                 fieldList();
             }
-            else
+            else {
                 System.out.print("Error #12a: there must be an attribute(s) after the word DISTINCT");
+                failed("The right token", currToken.tok);
+            }
 
             tempDistinct++;
         }
@@ -657,7 +738,8 @@ public class Compiler
         else if(Objects.equals(currToken.type, "ID"))
         {
 
-            CheckToken("ID", currToken.type);
+            idFound();
+            //CheckToken("ID", currToken.type);
             fieldList();
             //CheckToken("FROM", currToken.tok);
             //CheckToken("ID", currToken.type);
@@ -669,8 +751,15 @@ public class Compiler
         if(Objects.equals(currToken.type, "ID"))
         {
 
+            if(Objects.equals(tokenList.get(index+1).tok, ".")) {
+                sqlStatement(tokenList.get(index).tok+" "+tokenList.get(index+1).tok+" "+tokenList.get(index+2).tok);
+            }
+            else if(!Objects.equals(tokenList.get(index+1).tok, ".") && !Objects.equals(tokenList.get(index-1).tok, ".")) {
+                sqlStatement(tokenList.get(index).tok);
+            }
+
             CheckToken("ID", currToken.type);
-            fieldList();
+            //fieldList();
             //CheckToken("FROM", currToken.tok);
             //CheckToken("ID", currToken.type);
             //wSelectCommand3();
@@ -682,6 +771,7 @@ public class Compiler
         //{
             //CheckToken("FROM", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
+                tableNames.add(tokenList.get(index).tok);
                 CheckToken("ID", currToken.type);
                 if(Objects.equals(currToken.tok, "WHERE")){
                     wSelectCommand3();
@@ -750,7 +840,8 @@ public class Compiler
         {
             CheckToken("WHERE", currToken.tok);
             if(Objects.equals(currToken.type, "ID")) {
-                CheckToken("ID", currToken.type);
+                //CheckToken("ID", currToken.type);
+                idFound();
                 expression();
             }
             else
@@ -834,13 +925,18 @@ public class Compiler
     }
 
     public static void dotAttribute(){
-        if (Objects.equals(currToken.type, "NUM"))
+        //String tempString = "";
+        if (Objects.equals(currToken.tok, "."))
         {
+            //tempString = tokenList.get(index-1).tok+" "+tokenList.get(index).tok+" "+tokenList.get(index+1).tok;
+            //sqlStatement(tokenList.get(index-1).tok+" "+tokenList.get(index).tok+" "+tokenList.get(index+1).tok);
+            dotSpacer = false;
             CheckToken(".", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
                 CheckToken("ID", currToken.type);
-                if(Objects.equals(currToken.type, "NUM"))
-                    failed("NUM", currToken.type);
+                dotSpacer = true;
+                if(Objects.equals(currToken.tok, "."))
+                    failed(".", currToken.tok);
             }
             else {
                 failed("ID", currToken.type);
@@ -853,6 +949,7 @@ public class Compiler
         //CheckToken(",", currToken.tok);
         if (Objects.equals(currToken.tok, "AS"))
         {
+            sqlStatement(tokenList.get(index).tok);
             asStatment();
         }
         else if (Objects.equals(currToken.tok, ","))
@@ -860,26 +957,30 @@ public class Compiler
             CheckToken(",", currToken.tok);
             if(Objects.equals(currToken.type, "ID"))
             {
-                CheckToken("ID", currToken.type);
+                idFound();
+                //CheckToken("ID", currToken.type);
                 fieldList();
             }
             else if(Objects.equals(currToken.tok, "<")){
                 definitionThree();
             }
-            else
+            else {
                 System.out.print("Error #14a: missing an attribute or an opening angle bracket!");
+                failed("The right token", currToken.tok);
+            }
         }
         else if(Objects.equals(currToken.tok, "FROM")){
             CheckToken("FROM", currToken.tok);
             fromKeyWord();
         }
-        else if(Objects.equals(currToken.type, "NUM")){
+        else if(Objects.equals(currToken.tok, ".")){
 
             dotAttribute();
             fieldList();
         }
         else{
-            System.out.print("Error # 6a: missing a FROM, a comma, a dot or an AS");
+            System.out.print("Error #6a: missing a FROM, a comma, a dot or an AS");
+            failed("The right token", currToken.tok);
         }
         /*
         else if (Objects.equals(currToken.tok, "'"))
@@ -936,6 +1037,7 @@ public class Compiler
     {
         if (Objects.equals(currToken.tok, "AS"))
         {
+            sqlStatement(tokenList.get(index).tok);
             definitionThree_asStatment();
         }
         else if (Objects.equals(currToken.tok, ","))
@@ -943,7 +1045,17 @@ public class Compiler
             CheckToken(",", currToken.tok);
             if(Objects.equals(currToken.type, "ID"))
             {
-                CheckToken("ID", currToken.type);
+                /*
+                if((tokenList.get(index-1).tok != ".")||(tokenList.get(index+1).tok != ".")){
+                    if((tokenList.get(index+1).tok == ",") && (tokenList.get(index+2).tok == ">")){
+                        sqlStatement(tokenList.get(index).tok+" "+tokenList.get(index+2).tok);
+                    }else {
+                        sqlStatement(tokenList.get(index).tok);
+                    }
+                }
+                */
+                idFound();
+                //CheckToken("ID", currToken.type);
                 definitionThree_fieldList();
             }
             else if(Objects.equals(currToken.tok, "<")){
@@ -952,7 +1064,7 @@ public class Compiler
             else if(Objects.equals(currToken.tok, ">"))
                 definitionThree_closing();
         }
-        else if(Objects.equals(currToken.type, "NUM"))
+        else if(Objects.equals(currToken.tok, "."))
         {
             dotAttribute();
             definitionThree_fieldList();
@@ -962,20 +1074,37 @@ public class Compiler
         }
     }
 
+    public static void closingTagNames(){
+        //int ii = 0;
+        String tempi = "";
+        for (int ii = 0;tagNames.size()> ii; ii++){
+            tempi = tagNames.get(tagNames.size()-1);
+            sqlStatement(tempi+" "+">");
+
+            tagNames.remove(tagNames.size()-1);
+            //ii++;
+        }
+    }
+
     public static void definitionThree_closing(){
         if(Objects.equals(currToken.tok, ">")){
+            closingTagNames();
+            correctSql = false;
             CheckToken(">", currToken.tok);
             if(Objects.equals(currToken.tok, ",")){
                 CheckToken(",", currToken.tok);
                 if(Objects.equals(currToken.tok, "FROM")){
+                    correctSql = true;
                     CheckToken("FROM", currToken.tok);
                     fromKeyWord();
                 }
                 else if(Objects.equals(currToken.tok, ">")){
                     definitionThree_closing();
                 }
-                else
+                else {
                     System.out.print("Error #13a: missing a FROM keyword or a closed angle bracket!");
+                    failed("The right token", currToken.tok);
+                }
             }
             else
                 failed(",", currToken.tok);
@@ -986,17 +1115,24 @@ public class Compiler
 
     public static void definitionThree(){
         if(Objects.equals(currToken.tok, "<")){
+            correctSql = false;
+
             CheckToken("<", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
-                definitionThree_withoutCompression();
+                correctSql = true;
+                sqlStatement(tokenList.get(index-1).tok+" "+tokenList.get(index).tok);//TagName
+                tagNames.add(tokenList.get(index).tok);
+                definitionThree_tag();
             }
             else if(Objects.equals(currToken.tok, "+")){
+                sqlStatement(tokenList.get(index-1).tok+" "+tokenList.get(index).tok+""+tokenList.get(index+1).tok);//CompName
                 CheckToken("+", currToken.tok);
-                definitionThree_withoutCompression();
+                definitionThree_tag();
             }
             else
             {
                 System.out.print("Error #15a: missing the Compression Name or the Compression sign!");
+                failed("The right token", currToken.tok);
             }
         }
         else {
@@ -1004,14 +1140,15 @@ public class Compiler
         }
     }
 
-    public static void definitionThree_withoutCompression(){
+    public static void definitionThree_tag(){
         if(Objects.equals(currToken.type, "ID")){
             //TaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaagNames!
             CheckToken("ID", currToken.type);
             if(Objects.equals(currToken.tok, ",")){
                 CheckToken(",", currToken.tok);
                 if(Objects.equals(currToken.type, "ID")){
-                    CheckToken("ID", currToken.type);
+                    idFound();
+                    //CheckToken("ID", currToken.type);
                     definitionThree_fieldList();
                 }
                 else
@@ -1035,8 +1172,9 @@ public class Compiler
         {
             CheckToken("AS", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
-                CheckToken("ID", currToken.type);
-                if(Objects.equals(currToken.tok, ","))
+                idFound();
+                //CheckToken("ID", currToken.type);
+                if(Objects.equals(currToken.tok, ",") || Objects.equals(currToken.tok, "FROM"))
                     fieldList();
                 else
                     failed(",", currToken.tok);
@@ -1051,8 +1189,9 @@ public class Compiler
         {
             CheckToken("AS", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
-                CheckToken("ID", currToken.type);
-                if(Objects.equals(currToken.tok, ","))
+                idFound();
+                //CheckToken("ID", currToken.type);
+                if(Objects.equals(currToken.tok, ",")|| Objects.equals(currToken.tok, "FROM"))
                     definitionThree_fieldList();
                 else
                     failed(",", currToken.tok);
@@ -1135,7 +1274,7 @@ public class Compiler
             //compare();
             expression();
         }
-        else if(Objects.equals(currToken.type, "NUM")){
+        else if(Objects.equals(currToken.tok, ".")){
             dotAttribute();
             expression();
         }
@@ -1196,7 +1335,7 @@ public class Compiler
                 CheckToken("<=", currToken.tok);
                 afterOperator();
             }
-            else if(Objects.equals(currToken.type, "NUM")){
+            else if(Objects.equals(currToken.tok, ".")){
                 dotAttribute();
                 expression();
             }
@@ -1204,8 +1343,10 @@ public class Compiler
                 CheckToken("BETWEEN", currToken.tok);
                 inQuotes();
             }*/
-            else
+            else {
                 System.out.print("Error #7a: missing an operator like = or < or > or <= or >= or a continuation of the attribute!");
+                failed("The right token", currToken.tok);
+            }
 
 
 
@@ -1247,25 +1388,31 @@ public class Compiler
             }
             else{
                 System.out.print("Error #8a: missing the AND keyword or the semicolon!");
+                failed("The right token", currToken.tok);
             }
         }
-        else
+        else {
             System.out.print("Error #9a: next token should be a String or a number!");
+            failed("The right token", currToken.tok);
+        }
     }
 
     public static void inQuotes(){
         if(Objects.equals(currToken.tok, "'")){
             CheckToken("'", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
+                //idFound();
                 CheckToken("ID", currToken.type);
                 if(Objects.equals(currToken.tok, "'"))
                     CheckToken("'", currToken.tok);
-                else if(Objects.equals(currToken.type, "NUM")){
+                else if(Objects.equals(currToken.tok, ".")){
                     dotAttribute();
                     CheckToken("'", currToken.tok);
                 }
-                else
+                else {
                     System.out.print("Error #11a: missing either the closed quote or attribute continuation");
+                    failed("The right token", currToken.tok);
+                }
             }
             else{
                 failed("ID", currToken.type);
@@ -1281,10 +1428,13 @@ public class Compiler
         if (Objects.equals(currToken.tok, "AND")){
             CheckToken("AND", currToken.tok);
             if (Objects.equals(currToken.type, "ID")) {
+                //idFound();
                 CheckToken("ID", currToken.type);
                 expression();
-            } else
+            } else {
                 System.out.print("Error #10a: missing the attribute!");
+                failed("The right token", currToken.tok);
+            }
         }
         else if(Objects.equals(currToken.tok, ";")){
 
@@ -2893,6 +3043,8 @@ public class Compiler
     public static void debug(String s) {
     	if (DEBUG)
     		System.out.println(s);
+
+        stop = true;
     }
     
     public static void report_error(String e) {
