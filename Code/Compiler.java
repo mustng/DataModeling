@@ -102,6 +102,7 @@ public class Compiler
         keyWord.add("CHARACTER");
         keyWord.add("NUMBER");
         keyWord.add("INTEGER");
+        keyWord.add("AS");
 
         operator.add("<>");
         operator.add(">");
@@ -373,7 +374,7 @@ public class Compiler
 
             index++;
             currToken = tokenList.get(index);
-            //System.out.println(current);
+            System.out.println(current);
 
 
         }
@@ -1392,8 +1393,12 @@ public class Compiler
                 failed("The right token", currToken.tok);
             }
         }
+        else if(Objects.equals(currToken.type, "ID")){
+            CheckToken("ID", currToken.type);
+            dotAttribute();
+        }
         else {
-            System.out.print("Error #9a: next token should be a String or a number!");
+            System.out.print("Error #9a: next token should be a String, a number or another attribute!");
             failed("The right token", currToken.tok);
         }
     }
