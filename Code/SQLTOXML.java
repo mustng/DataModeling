@@ -14,6 +14,7 @@ public class SQLTOXML {
 //		tableInfo.add("ID");
 //		tableInfo.add("QUOTA");
 //		tableInfo.add("CITY");
+//		SELECT SNO, ID, QUOTA, CITY FROM S;
 		
 		String tryAgain[] = { 
 				"Run Another Query",
@@ -54,9 +55,9 @@ public class SQLTOXML {
 //				System.out.println(tableInfo);
 			}
 			else{
-				query = tableInfo.get(0);
+				query = tableInfo.get(0).replace(";", ""); 
 				tableInfo.remove(0);
-				query.replace(";", ""); 
+				System.out.println(query + "\n" + tableInfo);
 				XMLMaker.setQuery(query);
 				
 				System.out.println("Would you like to save the file to the hard disk?");
