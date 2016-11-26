@@ -9,15 +9,9 @@ public class SQLTOXML {
 	
 	public static void main(String args[]) {
 		
-		tableInfo.add("S , C"); 
-		tableInfo.add("S . SNO");
-		tableInfo.add("AS");
-		tableInfo.add("C . ID");
-		tableInfo.add("< tagname");
-		tableInfo.add("< tagname");
-		tableInfo.add("C . SNAME");
-		tableInfo.add("tagname >");
-		tableInfo.add("tagname >");
+		tableInfo.add("S"); 
+		tableInfo.add("SNO");
+		tableInfo.add("ID");
 		tableInfo.add("QUOTA");
 		tableInfo.add("CITY");
 		
@@ -53,6 +47,7 @@ public class SQLTOXML {
 			
 			System.out.println("Please enter the query you wish to execute");
 			query = queryInput.nextLine();
+			XMLMaker.setQuery(query);
 //			Parse.checkParse(query);
 			if (tableInfo.size() == 0){
 				//do nothing reset
@@ -92,6 +87,7 @@ public class SQLTOXML {
 			DisplayMenu(tryAgain);
 			currentInput = tryAgain[getData(tryAgain) - 1];
 			XMLMaker.resetFileName();
+			XMLMaker.resetQuery();
 		}
 	}
 	

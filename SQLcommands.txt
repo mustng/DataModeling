@@ -29,3 +29,5 @@ SELECT DISTINCT s.sname as Salesperson_Name, <+ Customer, orders.cno as Customer
 SELECT DISTINCT s.sname as salesperson_name, c.cname as customer_name, c.street ,c.city ,c.phone FROM s, c, orders, p WHERE s.sno = orders.sno and c.cno = orders.cno and p.pno= orders.pno;
 SELECT DISTINCT s.sname as salesperson_name, <Customer, c.cname as customer_name, <CustAddress ,c.street ,c.city ,c.phone,>,>, FROM s, c, orders, p WHERE s.sno = orders.sno and c.cno = orders.cno and p.pno= orders.pno
 
+SELECT DISTINCT s.sname as Salesperson_Name, orders.cno as Customer_No, orders.totqty FROM s, orders WHERE s.sno = orders.sno;
+

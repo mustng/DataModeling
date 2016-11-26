@@ -1,29 +1,28 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 public class DTD {
 	
 	public static void main(String args[]) {
 		ArrayList<String> tableInfo = new ArrayList<String>();
-		ArrayList<String> dtdLines = new ArrayList<String>();
-		
-		
-		ArrayList<ArrayList<?>> tableData = new ArrayList<ArrayList<?>>();
-		tableData.add(new ArrayList());
 		
 		tableInfo.add("S , C"); 
 		tableInfo.add("S . SNO");
 		tableInfo.add("AS");
 		tableInfo.add("C . ID");
 		tableInfo.add("< tagname");
+		tableInfo.add("< tagname");
 		tableInfo.add("C . SNAME");
+		tableInfo.add("tagname >");
 		tableInfo.add("tagname >");
 		tableInfo.add("QUOTA");
 		tableInfo.add("CITY");
+		
+		DTD(tableInfo);
+	}
+	
+	
+	public static void DTD(ArrayList<String> tableInfo ){
+		ArrayList<String> dtdLines = new ArrayList<String>();
 		
 		String printOut = "";
 		
@@ -34,8 +33,12 @@ public class DTD {
 			printOut += dtdLines.get(i) + "\n";
 		}
 	   
+//		if (nameFile){
+//			createFile(printOut, filename += ".dtd");
+//		}
 		System.out.println(printOut);
 	}
+	
 	
 	public static ArrayList<String> dtdSideBar(ArrayList<String> dtdLines, ArrayList<String> tableInfo){
 		dtdLines.add("<?xml ve rsion=\"1.0\"?>\n");
@@ -57,7 +60,7 @@ public class DTD {
 		return dtdLines;
 	}
 	
-	public static ArrayList<String> cleanArray(ArrayList<String> input){
+public static ArrayList<String> cleanArray(ArrayList<String> input){
 		
 		if (input.get(0).contains(",")){						//check for the main table
 			
@@ -68,12 +71,18 @@ public class DTD {
 		}
 		for(int i = 1; i < input.size(); i++){
 			
-			if(input.get(i).contains("<") || input.get(i).contains(">") || input.get(i).toUpperCase().contains("AS")){
+			if(input.get(i).contains("<") || input.get(i).contains(">")){
 				
 				input.remove(i);
 				i--;
 				
 			} 
+			else if (input.get(i).toUpperCase().contains("AS")){
+				input.remove(i + 1);
+				i--;
+				input.remove(i + 1);
+				i--;
+			}
 			else if(input.get(i).contains(".")){
 				
 				String[] splitWord = input.get(i).split("\\.");
@@ -84,5 +93,6 @@ public class DTD {
 //		System.out.println(input);
 		return input;
 	}
+	
 	
 }
