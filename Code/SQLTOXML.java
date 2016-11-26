@@ -9,11 +9,11 @@ public class SQLTOXML {
 	
 	public static void main(String args[]) {
 		
-		tableInfo.add("S"); 
-		tableInfo.add("SNO");
-		tableInfo.add("ID");
-		tableInfo.add("QUOTA");
-		tableInfo.add("CITY");
+//		tableInfo.add("S"); 
+//		tableInfo.add("SNO");
+//		tableInfo.add("ID");
+//		tableInfo.add("QUOTA");
+//		tableInfo.add("CITY");
 		
 		String tryAgain[] = { 
 				"Run Another Query",
@@ -45,14 +45,20 @@ public class SQLTOXML {
 		
 		while (!currentInput.equals("Exit the Program")){
 			
-			System.out.println("Please enter the query you wish to execute");
-			query = queryInput.nextLine();
-			XMLMaker.setQuery(query);
-//			Parse.checkParse(query);
+//			System.out.println("Please enter the query you wish to execute");
+//			query = queryInput.nextLine();
+			tableInfo = Compiler.compiler(tableInfo);
+			
 			if (tableInfo.size() == 0){
 				//do nothing reset
+//				System.out.println(tableInfo);
 			}
 			else{
+				query = tableInfo.get(0);
+				tableInfo.remove(0);
+				query.replace(";", ""); 
+				XMLMaker.setQuery(query);
+				
 				System.out.println("Would you like to save the file to the hard disk?");
 				DisplayMenu(yesOrNo);
 				
@@ -87,6 +93,8 @@ public class SQLTOXML {
 			DisplayMenu(tryAgain);
 			currentInput = tryAgain[getData(tryAgain) - 1];
 			XMLMaker.resetFileName();
+			Compiler.reset();
+			tableInfo.clear();
 			XMLMaker.resetQuery();
 		}
 	}

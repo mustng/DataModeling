@@ -12,53 +12,53 @@ import java.util.ArrayList;
 
 public class Compiler
 {
-    public static ArrayList<String> attributes = new ArrayList<String>();
-    public static ArrayList<String> values = new ArrayList<String>();
-    public static ArrayList<String> attributeTypes = new ArrayList<String>();
-    public static ArrayList<String> firstOperand = new ArrayList<String>();
-    public static ArrayList<String> secondOperand = new ArrayList<String>();
-    public static ArrayList<String> actions = new ArrayList<String>();
-    //public static DatabaseManager databaseManager = new DatabaseManager("Databases/");//16
-    //public static Database database = null;//16
-    //public static DatabaseDataDefinitionManager databaseDataDefinitionManager = null;//16
-    //public static DatabaseDataManipulationManager databaseDataManipulationManager = null;//16
-    //public static DatabaseDataWManipulationManager databaseWDataManipulationManager = null;//16
+	private static ArrayList<String> attributes = new ArrayList<String>();
+	private static ArrayList<String> values = new ArrayList<String>();
+	private static ArrayList<String> attributeTypes = new ArrayList<String>();
+	private static ArrayList<String> firstOperand = new ArrayList<String>();
+	private static ArrayList<String> secondOperand = new ArrayList<String>();
+	private static ArrayList<String> actions = new ArrayList<String>();
+    //private static DatabaseManager databaseManager = new DatabaseManager("Databases/");//16
+    //private static Database database = null;//16
+    //private static DatabaseDataDefinitionManager databaseDataDefinitionManager = null;//16
+    //private static DatabaseDataManipulationManager databaseDataManipulationManager = null;//16
+    //private static DatabaseDataWManipulationManager databaseWDataManipulationManager = null;//16
 
-	public static final boolean DEBUG = true;
-	public static final boolean REPORT_ERROR = true;
+	private static final boolean DEBUG = true;
+	private static final boolean REPORT_ERROR = true;
 
-    public static ArrayList<String> originalList = new ArrayList<String>();
-    public static ArrayList<String> tableNames = new ArrayList<String>();
-    public static ArrayList<String> finalList = new ArrayList<String>();
-    public static ArrayList<String> originalAttributeNames = new ArrayList<String>();
-    public static ArrayList<String> newAttributeNames = new ArrayList<String>();
-    public static ArrayList<String> tagNames = new ArrayList<String>();
-    public static ArrayList<String> taggedAttributes = new ArrayList<String>();
-    public static String lineEntered  = "";
-    public static boolean stop = false;
-    public static boolean dotSpacer = true;
-    public static boolean correctSql = true;
-    public static ArrayList<Token> tokenList = new ArrayList<Token>();                              //The token list for parsing and semantics
-    public static String lineInput = "";                                                            //Stores the queries for scanning, parsing, and semantics
-    public static ArrayList<String> operator = new ArrayList<String>();                             //Used for the compare method
-    public static ArrayList<String> keyWord = new ArrayList<String>();                              //Create reference array to compare tokens
-    public static ArrayList<String> tokens = new ArrayList<String>();                               //Create reference array to compare tokens
-    public static ArrayList<String> systemLevel = new ArrayList<String>();                          //Create reference array list for first of system level commands
-    public static boolean tableFlag = false;                                                        //flag for creating tables and checks for parsing and/or semantics
-    public static boolean numFlag = false;                                                          //flag for scanner logic
-    public static boolean charFlag = false;                                                         //flag for scanner logic
-    public static  String ID = "";                                                                  //variable for scanner
-    public static String num = "";                                                                  //variable for scanner
-    public static int index = 0;                                                                    //variable to keep track of the current token in the tokenList for Parsing
-    public static Token currToken;                                                                  //variable to keep track of the current token for Parsing
-    public static boolean errorFlag = false;                                                        //Flag to check for errors inside of the parse
-    public static boolean createTabFlag = false;                                                    //Flag to check for a create table command inside the parse
-    public static String tableNameG  = "";
-    public static String attributeNameG = "";
-    public static String valueNameG = "";
-    public static int tempDistinct = 0;
+	private static ArrayList<String> originalList = new ArrayList<String>();
+	private static ArrayList<String> tableNames = new ArrayList<String>();
+	private static ArrayList<String> finalList = new ArrayList<String>();
+	private static ArrayList<String> originalAttributeNames = new ArrayList<String>();
+	private static ArrayList<String> newAttributeNames = new ArrayList<String>();
+	private static ArrayList<String> tagNames = new ArrayList<String>();
+	private static ArrayList<String> taggedAttributes = new ArrayList<String>();
+	private static String lineEntered  = "";
+	private static boolean stop = false;
+	private static boolean dotSpacer = true;
+	private static boolean correctSql = true;
+	private static ArrayList<Token> tokenList = new ArrayList<Token>();                              //The token list for parsing and semantics
+	private static String lineInput = "";                                                            //Stores the queries for scanning, parsing, and semantics
+	private static ArrayList<String> operator = new ArrayList<String>();                             //Used for the compare method
+	private static ArrayList<String> keyWord = new ArrayList<String>();                              //Create reference array to compare tokens
+	private static ArrayList<String> tokens = new ArrayList<String>();                               //Create reference array to compare tokens
+	private static ArrayList<String> systemLevel = new ArrayList<String>();                          //Create reference array list for first of system level commands
+	private static boolean tableFlag = false;                                                        //flag for creating tables and checks for parsing and/or semantics
+	private static boolean numFlag = false;                                                          //flag for scanner logic
+	private static boolean charFlag = false;                                                         //flag for scanner logic
+	private static  String ID = "";                                                                  //variable for scanner
+	private static String num = "";                                                                  //variable for scanner
+	private static int index = 0;                                                                    //variable to keep track of the current token in the tokenList for Parsing
+	private static Token currToken;                                                                  //variable to keep track of the current token for Parsing
+	private static boolean errorFlag = false;                                                        //Flag to check for errors inside of the parse
+	private static boolean createTabFlag = false;                                                    //Flag to check for a create table command inside the parse
+	private static String tableNameG  = "";
+	private static String attributeNameG = "";
+	private static String valueNameG = "";
+	private static int tempDistinct = 0;
 
-    public static long total = 0;
+	private static long total = 0;
 
 
 
@@ -143,7 +143,6 @@ public class Compiler
             debug("");
         }
         
-        System.out.println(tableNames);
         return tableNames;
     }
     public static boolean menu()
@@ -408,7 +407,7 @@ public class Compiler
 
             tableNames.addAll(originalList);
             tableNames.add(0, lineEntered);
-            System.out.println(tableNames);
+//            System.out.println(tableNames);
             //for(String thing : originalList)
                 //System.out.print(thing);
             //semantics();
