@@ -427,92 +427,92 @@ public static void XML(ArrayList<String> tableInfo ){
 		return space;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
-		
-		cleanArray(tableInfo);
-		
-		((ArrayList<String>)tableData.get(0)).add(tableInfo.get(0));
-		tableData.add(new ArrayList());
-		
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            
-        }
-        catch (ClassNotFoundException e){
-            System.out.println("Could not load driver.");
-        }
-        Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
-        
-        Statement stmt = conn.createStatement();
-        ResultSet res = stmt.executeQuery(query);
-        int j = 1;
-        while( res.next() ) {
-        	for (int i = 1; i < tableInfo.size(); i++){
-        		((ArrayList<String>)tableData.get(j)).add(res.getString(i));
-
-        	}
-        	tableData.add(new ArrayList());
-        	j++;
-        }
-        
-	      for(int l = 0; l < tableData.size();l++){
-	          for(int m = 0; m < ((ArrayList)tableData.get(l)).size(); m++){
-	             System.out.print( (String)((ArrayList)tableData.get(l)).get(m) +"  ");
-	          }
-	          System.out.println();
-	       }
-	      
-        stmt.close();
-        
+//	@SuppressWarnings("unchecked")
+//	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
+//		
+//		cleanArray(tableInfo);
+//		
+//		((ArrayList<String>)tableData.get(0)).add(tableInfo.get(0));
+//		tableData.add(new ArrayList());
+//		
+//        try {
+//            Class.forName("oracle.jdbc.driver.OracleDriver");
+//            
+//        }
+//        catch (ClassNotFoundException e){
+//            System.out.println("Could not load driver.");
+//        }
+//        Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
+//        
+//        Statement stmt = conn.createStatement();
+//        ResultSet res = stmt.executeQuery(query);
+//        int j = 1;
+//        while( res.next() ) {
+//        	for (int i = 1; i < tableInfo.size(); i++){
+//        		((ArrayList<String>)tableData.get(j)).add(res.getString(i));
+//
+//        	}
+//        	tableData.add(new ArrayList());
+//        	j++;
+//        }
+//        
+//	      for(int l = 0; l < tableData.size();l++){
+//	          for(int m = 0; m < ((ArrayList)tableData.get(l)).size(); m++){
+//	             System.out.print( (String)((ArrayList)tableData.get(l)).get(m) +"  ");
+//	          }
+//	          System.out.println();
+//	       }
+//	      
+//        stmt.close();
+//        
 //	      for(int m = 0; m < tableData.size();m++){
 //	          for(int n = 0; n < ((ArrayList)tableData.get(m)).size(); n++){
 //	             System.out.print( (String)((ArrayList)tableData.get(m)).get(n) +"  ");
 //	          }
 //	          System.out.println();
 //	       }
-        return tableData;
-    }
-	
-//	@SuppressWarnings("unchecked")
-//	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
-//		
-//		tableData.add(new ArrayList());
-//	      
-//	      ((ArrayList<String>)tableData.get(1)).add("S1");
-//	      ((ArrayList<String>)tableData.get(1)).add("Adams");
-//	      ((ArrayList<String>)tableData.get(1)).add("3000");
-//	      ((ArrayList<String>)tableData.get(1)).add("Dallas");
-//	      tableData.add(new ArrayList());
-//	      ((ArrayList<String>)tableData.get(2)).add("S2");
-//	      ((ArrayList<String>)tableData.get(2)).add("Smith");
-//	      ((ArrayList<String>)tableData.get(2)).add("10000");
-//	      ((ArrayList<String>)tableData.get(2)).add("Chicago");
-//	      tableData.add(new ArrayList());
-//	      ((ArrayList<String>)tableData.get(3)).add("S3");
-//	      ((ArrayList<String>)tableData.get(3)).add("Jones");
-//	      ((ArrayList<String>)tableData.get(3)).add("7500");
-//	      ((ArrayList<String>)tableData.get(3)).add("Phoenix");
-//	      tableData.add(new ArrayList());
-//	      ((ArrayList<String>)tableData.get(4)).add("S4");
-//	      ((ArrayList<String>)tableData.get(4)).add("Knapp");
-//	      ((ArrayList<String>)tableData.get(4)).add("13000");
-//	      ((ArrayList<String>)tableData.get(4)).add("San Diego");
-//	      tableData.add(new ArrayList());
-//	      ((ArrayList<String>)tableData.get(5)).add("S5");
-//	      ((ArrayList<String>)tableData.get(5)).add("Martin");
-//	      ((ArrayList<String>)tableData.get(5)).add("25000");
-//	      ((ArrayList<String>)tableData.get(5)).add("New York");
-//	      
-//	      for(int i = 0; i < tableData.size();i++){
-//	          for(int j = 0; j < ((ArrayList)tableData.get(i)).size(); j++){
-//	             System.out.print( (String)((ArrayList)tableData.get(i)).get(j) +"  ");
-//	          }
-//	          System.out.println();
-//	       }
-//        
 //        return tableData;
 //    }
+	
+	@SuppressWarnings("unchecked")
+	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
+		
+		tableData.add(new ArrayList());
+	      
+	      ((ArrayList<String>)tableData.get(1)).add("S1");
+	      ((ArrayList<String>)tableData.get(1)).add("Adams");
+	      ((ArrayList<String>)tableData.get(1)).add("3000");
+	      ((ArrayList<String>)tableData.get(1)).add("Dallas");
+	      tableData.add(new ArrayList());
+	      ((ArrayList<String>)tableData.get(2)).add("S2");
+	      ((ArrayList<String>)tableData.get(2)).add("Smith");
+	      ((ArrayList<String>)tableData.get(2)).add("10000");
+	      ((ArrayList<String>)tableData.get(2)).add("Chicago");
+	      tableData.add(new ArrayList());
+	      ((ArrayList<String>)tableData.get(3)).add("S3");
+	      ((ArrayList<String>)tableData.get(3)).add("Jones");
+	      ((ArrayList<String>)tableData.get(3)).add("7500");
+	      ((ArrayList<String>)tableData.get(3)).add("Phoenix");
+	      tableData.add(new ArrayList());
+	      ((ArrayList<String>)tableData.get(4)).add("S4");
+	      ((ArrayList<String>)tableData.get(4)).add("Knapp");
+	      ((ArrayList<String>)tableData.get(4)).add("13000");
+	      ((ArrayList<String>)tableData.get(4)).add("San Diego");
+	      tableData.add(new ArrayList());
+	      ((ArrayList<String>)tableData.get(5)).add("S5");
+	      ((ArrayList<String>)tableData.get(5)).add("Martin");
+	      ((ArrayList<String>)tableData.get(5)).add("25000");
+	      ((ArrayList<String>)tableData.get(5)).add("New York");
+	      
+	      for(int i = 0; i < tableData.size();i++){
+	          for(int j = 0; j < ((ArrayList)tableData.get(i)).size(); j++){
+	             System.out.print( (String)((ArrayList)tableData.get(i)).get(j) +"  ");
+	          }
+	          System.out.println();
+	       }
+        
+        return tableData;
+    }
 
 
 	public static void setQuery(String query2) {

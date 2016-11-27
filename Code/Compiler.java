@@ -136,7 +136,8 @@ public class Compiler
 
         boolean value = true;                                                               //Flag to execute a user interactive menu
 
-
+        System.out.println(stop);
+        
         while (value == true && stop == false)
         {
             value = menu();
@@ -146,6 +147,11 @@ public class Compiler
         
         return tableNames;
     }
+   
+	public static void resetTableName() {
+		tableNames.clear();
+		stop = false;
+	}
     public static boolean menu()
     {
         Scanner input = new Scanner(System.in);
@@ -3062,6 +3068,7 @@ public class Compiler
     	if (REPORT_ERROR)
     		System.out.println(e + " [ at token " + tokenList.get(count).tok + " ] ");
     }
+
 }
 
 //Token objects for Parser and Semantics

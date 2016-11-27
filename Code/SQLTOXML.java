@@ -95,6 +95,7 @@ public class SQLTOXML {
 			currentInput = tryAgain[getData(tryAgain) - 1];
 			XMLMaker.resetFileName();
 			Compiler.reset();
+			Compiler.resetTableName();
 			tableInfo.clear();
 			XMLMaker.resetQuery();
 		}
