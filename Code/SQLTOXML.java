@@ -14,7 +14,7 @@ public class SQLTOXML {
 //		tableInfo.add("ID");
 //		tableInfo.add("QUOTA");
 //		tableInfo.add("CITY");
-//		SELECT SNO, ID, QUOTA, CITY FROM S;
+//		SELECT SNO, SNAME, QUOTA, CITY FROM S;
 		
 		String tryAgain[] = { 
 				"Run Another Query",

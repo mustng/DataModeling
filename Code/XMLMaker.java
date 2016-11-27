@@ -20,7 +20,7 @@ public class XMLMaker {
 		
 		cleanArray(input);
 
-        printOut += "<?xml version = \"1.0\"?>\n";
+        printOut += "\n\n<?xml version = \"1.0\"?>\n";
         printOut += "<xs:schema xmlns:xs = \"http://www.w3.org/2001/XMLSchema\">\n";
         printOut += "<xs:element name = \"" + filename + "\" elementFormDefault=\"qualified\"attributeFormDefault=\"qualified\">\n";
         for (int i = 0; i < tables.length; i++)
@@ -208,7 +208,7 @@ public static void XML(ArrayList<String> tableInfo ){
 			runQuery(tableData, tableInfo); //fetch sql query
 		}
 	} catch (SQLException e) {
-		System.out.println("Issue with connection");
+		System.out.println("Issue with connection or running a bad query against the database!");
 		return;
 	}
 	
@@ -456,10 +456,24 @@ public static void XML(ArrayList<String> tableInfo ){
         	j++;
         }
         
+	      for(int l = 0; l < tableData.size();l++){
+	          for(int m = 0; m < ((ArrayList)tableData.get(l)).size(); m++){
+	             System.out.print( (String)((ArrayList)tableData.get(l)).get(m) +"  ");
+	          }
+	          System.out.println();
+	       }
+	      
         stmt.close();
+        
+//	      for(int m = 0; m < tableData.size();m++){
+//	          for(int n = 0; n < ((ArrayList)tableData.get(m)).size(); n++){
+//	             System.out.print( (String)((ArrayList)tableData.get(m)).get(n) +"  ");
+//	          }
+//	          System.out.println();
+//	       }
         return tableData;
     }
-//	
+	
 //	@SuppressWarnings("unchecked")
 //	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
 //		
