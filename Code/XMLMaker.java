@@ -477,6 +477,28 @@ public static void XML(ArrayList<String> tableInfo ){
         
         return tableData;
     }
+	public static ArrayList<String> getAttributes(ArrayList<String> table) throws SQLException
+	{
+		ArrayList<String> atts = new ArrayList<>();
+		try
+		{
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		}
+		catch (ClassNotFoundException e){
+			System.out.println("Could not load driver.");
+		}
+		Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
+		Statement stmt = conn.createStatement();
+		for (int i = 0; i < table.size(); i++)
+		{
+			ResultSet res = stmt.executeQuery("Select COLUMN_NAME, data_type from user_tab_columns where TABLE_NAME = '"+ table.get(i) +"'");
+			while( res.next() )
+				atts.add(res.getString(1));
+		}
+		stmt.close();
+
+		return atts;
+	}
 	
 //	@SuppressWarnings("unchecked")
 //	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
