@@ -477,7 +477,7 @@ public static void XML(ArrayList<String> tableInfo ){
         
         return tableData;
     }
-	public static ArrayList<String> getAttributes(ArrayList<String> table) throws SQLException
+	public static ArrayList<String> getAttributes(ArrayList<String> table)
 	{
 		String[] tbls = table.get(0).replaceAll(" ", "").split(",");
 		try
@@ -488,18 +488,26 @@ public static void XML(ArrayList<String> tableInfo ){
 		{
 			System.out.println("Could not load driver.");
 		}
-		Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
-		Statement stmt = conn.createStatement();
-		for (int i = 0; i < tbls.length; i++)
+		try
 		{
-			ResultSet res = stmt.executeQuery("Select COLUMN_NAME, data_type from user_tab_columns where TABLE_NAME = '"+ tbls[i] +"'");
-			while( res.next() )
-				table.add(res.getString(1));
-		}
-		stmt.close();
+			Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
+			Statement stmt = conn.createStatement();
+			for (int i = 0; i < tbls.length; i++)
+			{
+				ResultSet res = stmt.executeQuery("Select COLUMN_NAME, data_type from user_tab_columns where TABLE_NAME = '"+ tbls[i] +"'");
+				while( res.next() )
+					table.add(res.getString(1));
+			}
+			stmt.close();
 
-		table.remove(table.indexOf("*"));
-		return table;
+			table.remove(table.indexOf("*"));
+			return table;
+		}
+		catch (SQLException f)
+		{
+			return null;
+		}
+
 	}
 	
 //	@SuppressWarnings("unchecked")
