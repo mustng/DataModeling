@@ -15,16 +15,20 @@ public class SQLTOXML {
 //		tableInfo.add("QUOTA");
 //		tableInfo.add("CITY");
 //		SELECT SNO, SNAME, QUOTA, CITY FROM S;
-		
-		String yesOrNo[] = {    //options
-				"Yes",
-				"No"
-			};
+//		SELECT DISTINCT s.sname as Salesperson_Name, orders.cno as Customer_No, orders.totqty FROM s, orders WHERE s.sno = orders.sno
 		
 		String options[] = { 
 				"Create and View a DTD File",
 				"Create and View a XSD File",
 				"Create and View a XML File",
+				"Run Another Query",
+				"Exit the Program"
+			};
+		String yesOrNo[] = {    //options
+				"Yes",
+				"No"
+		};
+		String badOptionsTryAgain[] = { 
 				"Run Another Query",
 				"Exit the Program"
 			};
@@ -40,7 +44,7 @@ public class SQLTOXML {
 		String query = "";
 		String fileName ="";
 		
-		System.out.println("Welcome to XML Maker");
+		System.out.println("Welcome to the XML Maker");
 		
 		while (!currentInput.equals("Exit the Program")){
 			
@@ -49,6 +53,10 @@ public class SQLTOXML {
 			tableInfo = Compiler.compiler(tableInfo);
 			
 			if (tableInfo.size() == 0){
+				System.out.println("Please enter your option.");
+				DisplayMenu(badOptionsTryAgain);
+				currentInput = badOptionsTryAgain[getData(badOptionsTryAgain) - 1];
+				
 				//do nothing reset
 //				System.out.println(tableInfo);
 			}
