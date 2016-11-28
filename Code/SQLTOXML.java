@@ -66,6 +66,9 @@ public class SQLTOXML {
 				
 				System.out.println(query + "\n" + tableInfo);
 				XMLMaker.setQuery(query);
+				if (tableInfo.contains("*"))
+					tableInfo = XMLMaker.getAttributes(tableInfo);
+
 				
 				System.out.println("Would you like to save the file to the hard disk?");
 				DisplayMenu(yesOrNo);
