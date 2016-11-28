@@ -19,10 +19,11 @@ public class XMLMaker {
         String dataType;
 		
 		cleanArray(input);
-
+		
+		String temp2 = filename;
         printOut += "\n\n<?xml version = \"1.0\"?>\n";
         printOut += "<xs:schema xmlns:xs = \"http://www.w3.org/2001/XMLSchema\">\n";
-        printOut += "<xs:element name = \"" + filename + "\" elementFormDefault=\"qualified\"attributeFormDefault=\"qualified\">\n";
+        printOut += "<xs:element name = \"" + temp2 + "\" elementFormDefault=\"qualified\"attributeFormDefault=\"qualified\">\n";
         for (int i = 0; i < tables.length; i++)
         {
             printOut += "<xsd:complexType name=\"" + tables[i] + "\">\n";
@@ -34,9 +35,10 @@ public class XMLMaker {
                 dataType = null;
             }
             printOut += "</xsd:complexType >\n";
-
+            
+        String temp = filename;
 		if (nameFile){
-			createFile(printOut, filename += ".xsd");
+			createFile(printOut, temp += ".xsd");
 		}
         }
         printOut += "</schema>\n\n";
@@ -115,9 +117,9 @@ public class XMLMaker {
 		for (int i  = 0; i < dtdLines.size(); i++){
 			printOut += dtdLines.get(i) + "\n";
 		}
-	   
+	   String temp = filename;
 		if (nameFile){
-			createFile(printOut, filename += ".dtd");
+			createFile(printOut, temp += ".dtd");
 		}
 		System.out.println(printOut);
 	}
@@ -212,19 +214,25 @@ public static void XML(ArrayList<String> tableInfo ){
 		return;
 	}
 	
-	
+	String temp = filename;
 	String printOut = "<?xml version = \"1.0\"?>\n<!DOCTYPE " + tableInfo.get(0) + " INFORMATION \"" 
-			+ filename + ".dtd\">\n\n";
+			+ temp + ".dtd\">\n\n";
 	boolean plusFound = false;
 	int recordIndex = 0;
 	int startKIndex = 0;
 	boolean recordIndexHit = true;
 	int k = 0;  //index of the XMLLines array
+	
+	System.out.println(xmlLines);
+
 	   for(int i = 1; i < tableData.size();i++){
-		   printOut += xmlLines.get(0) + "\n";
-//		   System.out.println(xmlLines.get(0));
 		   
 	        for(int j = 0; j < ((ArrayList<?>)tableData.get(i)).size(); j++){
+	        	if (j == 0){
+	        		printOut += xmlLines.get(0) + "\n";
+//	        		System.out.println(xmlLines.get(0));
+	        	}
+	 		   
 	        	if (k + 2 > xmlLines.size() - 1){
 	        		k = 0;
 	        	}
@@ -235,12 +243,12 @@ public static void XML(ArrayList<String> tableInfo ){
 	        			recordIndexHit = false;
 	        		}
 	        		k += 2;
-	        		System.out.println(xmlLines.get(k) + ((ArrayList)tableData.get(i)).get(j) + xmlLines.get(k + 1));
+//	        		System.out.println(xmlLines.get(k) + ((ArrayList)tableData.get(i)).get(j) + xmlLines.get(k + 1));
 	        		printOut += xmlLines.get(k) + ((ArrayList<?>)tableData.get(i)).get(j) + xmlLines.get(k + 1) + "\n";
 	        		
 	        		if(k  + 2 <xmlLines.size() && xmlLines.get(k + 2).contains("~")){
 	        			if( i + 2 > tableData.size()){
-	        				System.out.println(xmlLines.get(k + 2).replace("~", "").replace("@", ""));
+//	        				System.out.println(xmlLines.get(k + 2).replace("~", "").replace("@", ""));
 	        				printOut += xmlLines.get(k + 2).replace("~", "").replace("@", "") + "\n";
 	        				k = 0;
 	        			}
@@ -250,7 +258,7 @@ public static void XML(ArrayList<String> tableInfo ){
 	        				i++;
 	        			}
 	        			else{
-	        				System.out.println(xmlLines.get(k + 2).replace("~", "").replace("@", ""));
+//	        				System.out.println(xmlLines.get(k + 2).replace("~", "").replace("@", ""));
 	        				printOut += xmlLines.get(k + 2).replace("~", "").replace("@", "") + "\n";;
 	        				recordIndexHit = true;
 	        				plusFound = false;
@@ -260,7 +268,7 @@ public static void XML(ArrayList<String> tableInfo ){
 	        		
 	        	}
 	        	else if (xmlLines.get(k + 2).contains("@") && xmlLines.get(k + 2).contains("+")){
-	        		System.out.println(xmlLines.get(k + 2).replace("@", ""));
+//	        		System.out.println(xmlLines.get(k + 2).replace("@", ""));
 	        		printOut += xmlLines.get(k + 2).replace("@", "") + "\n";
 	        		k++;
 					j--;
@@ -290,13 +298,15 @@ public static void XML(ArrayList<String> tableInfo ){
 	        		}
 	        		
 	        	}
+	        	if (j == ((ArrayList<?>)tableData.get(i)).size() - 1){
+	        		printOut += xmlLines.get(1) + "\n";
+//	        		System.out.println(xmlLines.get(1));
+	        	}
 	        }
-       printOut += xmlLines.get(1) + "\n";
-//       System.out.println(xmlLines.get(1));
 	   }
-	
+	String temp2 = filename;
 	if (nameFile){
-		createFile(printOut, filename += ".xml");
+		createFile(printOut, temp2 += ".xml");
 	}
 	System.out.println(printOut);
 }
@@ -427,92 +437,87 @@ public static void XML(ArrayList<String> tableInfo ){
 		return space;
 	}
 	
-//	@SuppressWarnings("unchecked")
-//	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
-//		
-//		cleanArray(tableInfo);
-//		
-//		((ArrayList<String>)tableData.get(0)).add(tableInfo.get(0));
-//		tableData.add(new ArrayList());
-//		
-//        try {
-//            Class.forName("oracle.jdbc.driver.OracleDriver");
-//            
-//        }
-//        catch (ClassNotFoundException e){
-//            System.out.println("Could not load driver.");
-//        }
-//        Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
-//        
-//        Statement stmt = conn.createStatement();
-//        ResultSet res = stmt.executeQuery(query);
-//        int j = 1;
-//        while( res.next() ) {
-//        	for (int i = 1; i < tableInfo.size(); i++){
-//        		((ArrayList<String>)tableData.get(j)).add(res.getString(i));
-//
-//        	}
-//        	tableData.add(new ArrayList());
-//        	j++;
-//        }
-//        
-//	      for(int l = 0; l < tableData.size();l++){
-//	          for(int m = 0; m < ((ArrayList)tableData.get(l)).size(); m++){
-//	             System.out.print( (String)((ArrayList)tableData.get(l)).get(m) +"  ");
-//	          }
-//	          System.out.println();
-//	       }
-//	      
-//        stmt.close();
-//        
-//	      for(int m = 0; m < tableData.size();m++){
-//	          for(int n = 0; n < ((ArrayList)tableData.get(m)).size(); n++){
-//	             System.out.print( (String)((ArrayList)tableData.get(m)).get(n) +"  ");
-//	          }
-//	          System.out.println();
-//	       }
-//        return tableData;
-//    }
-	
 	@SuppressWarnings("unchecked")
 	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
 		
+		cleanArray(tableInfo);
+		
+		((ArrayList<String>)tableData.get(0)).add(tableInfo.get(0));
 		tableData.add(new ArrayList());
+		
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            
+        }
+        catch (ClassNotFoundException e){
+            System.out.println("Could not load driver.");
+        }
+        Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
+        
+        Statement stmt = conn.createStatement();
+        ResultSet res = stmt.executeQuery(query);
+        int j = 1;
+        while( res.next() ) {
+        	for (int i = 1; i < tableInfo.size(); i++){
+        		((ArrayList<String>)tableData.get(j)).add(res.getString(i));
+
+        	}
+        	tableData.add(new ArrayList());
+        	j++;
+        }
 	      
-	      ((ArrayList<String>)tableData.get(1)).add("S1");
-	      ((ArrayList<String>)tableData.get(1)).add("Adams");
-	      ((ArrayList<String>)tableData.get(1)).add("3000");
-	      ((ArrayList<String>)tableData.get(1)).add("Dallas");
-	      tableData.add(new ArrayList());
-	      ((ArrayList<String>)tableData.get(2)).add("S2");
-	      ((ArrayList<String>)tableData.get(2)).add("Smith");
-	      ((ArrayList<String>)tableData.get(2)).add("10000");
-	      ((ArrayList<String>)tableData.get(2)).add("Chicago");
-	      tableData.add(new ArrayList());
-	      ((ArrayList<String>)tableData.get(3)).add("S3");
-	      ((ArrayList<String>)tableData.get(3)).add("Jones");
-	      ((ArrayList<String>)tableData.get(3)).add("7500");
-	      ((ArrayList<String>)tableData.get(3)).add("Phoenix");
-	      tableData.add(new ArrayList());
-	      ((ArrayList<String>)tableData.get(4)).add("S4");
-	      ((ArrayList<String>)tableData.get(4)).add("Knapp");
-	      ((ArrayList<String>)tableData.get(4)).add("13000");
-	      ((ArrayList<String>)tableData.get(4)).add("San Diego");
-	      tableData.add(new ArrayList());
-	      ((ArrayList<String>)tableData.get(5)).add("S5");
-	      ((ArrayList<String>)tableData.get(5)).add("Martin");
-	      ((ArrayList<String>)tableData.get(5)).add("25000");
-	      ((ArrayList<String>)tableData.get(5)).add("New York");
-	      
-	      for(int i = 0; i < tableData.size();i++){
-	          for(int j = 0; j < ((ArrayList)tableData.get(i)).size(); j++){
-	             System.out.print( (String)((ArrayList)tableData.get(i)).get(j) +"  ");
+        stmt.close();
+        
+	      for(int m = 0; m < tableData.size();m++){
+	          for(int n = 0; n < ((ArrayList)tableData.get(m)).size(); n++){
+	             System.out.print( (String)((ArrayList)tableData.get(m)).get(n) +"  ");
 	          }
 	          System.out.println();
 	       }
         
         return tableData;
     }
+	
+//	@SuppressWarnings("unchecked")
+//	private static ArrayList<ArrayList<?>> runQuery(ArrayList<ArrayList<?>> tableData, ArrayList<String> tableInfo) throws SQLException {
+//		
+//		tableData.add(new ArrayList());
+//	      
+//	      ((ArrayList<String>)tableData.get(1)).add("S1");
+//	      ((ArrayList<String>)tableData.get(1)).add("Adams");
+//	      ((ArrayList<String>)tableData.get(1)).add("3000");
+//	      ((ArrayList<String>)tableData.get(1)).add("Dallas");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(2)).add("S2");
+//	      ((ArrayList<String>)tableData.get(2)).add("Smith");
+//	      ((ArrayList<String>)tableData.get(2)).add("10000");
+//	      ((ArrayList<String>)tableData.get(2)).add("Chicago");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(3)).add("S3");
+//	      ((ArrayList<String>)tableData.get(3)).add("Jones");
+//	      ((ArrayList<String>)tableData.get(3)).add("7500");
+//	      ((ArrayList<String>)tableData.get(3)).add("Phoenix");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(4)).add("S4");
+//	      ((ArrayList<String>)tableData.get(4)).add("Knapp");
+//	      ((ArrayList<String>)tableData.get(4)).add("13000");
+//	      ((ArrayList<String>)tableData.get(4)).add("San Diego");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(5)).add("S5");
+//	      ((ArrayList<String>)tableData.get(5)).add("Martin");
+//	      ((ArrayList<String>)tableData.get(5)).add("25000");
+//	      ((ArrayList<String>)tableData.get(5)).add("New York");
+//	      ((ArrayList<String>)tableData.get(5)).add("New York");
+//	      
+////	      for(int i = 0; i < tableData.size();i++){
+////	          for(int j = 0; j < ((ArrayList)tableData.get(i)).size(); j++){
+////	             System.out.print( (String)((ArrayList)tableData.get(i)).get(j) +"  ");
+////	          }
+////	          System.out.println();
+////	       }
+//        
+//        return tableData;
+//    }
 
 
 	public static void setQuery(String query2) {

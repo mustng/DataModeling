@@ -29,7 +29,7 @@ public class SQLTOXML {
 				"Exit the Program"
 			};
 		
-		boolean runAnotherProgram = false;
+		boolean runAnotherQuery = false;
 		
 //		@SuppressWarnings("resource")
 //		Scanner queryInput = new Scanner(System.in);
@@ -88,13 +88,13 @@ public class SQLTOXML {
 					}
 					else if (currentInput.equals("Run Another Query")){
 						currentInput = "Exit the Program";
-						runAnotherProgram = true;
+						runAnotherQuery = true;
 					}
 				}
 			}
-			if (runAnotherProgram){
-				currentInput = "Not going to exit";
-				runAnotherProgram = false;
+			if (runAnotherQuery){
+				currentInput = "Not going to exit and run another query";
+				runAnotherQuery = false;
 			}
 			XMLMaker.resetFileName();
 			Compiler.reset();
