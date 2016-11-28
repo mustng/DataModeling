@@ -477,6 +477,8 @@ public static void XML(ArrayList<String> tableInfo ){
         
         return tableData;
     }
+	
+	
 	public static ArrayList<String> getAttributes(ArrayList<String> table)
 	{
 		String[] tbls = table.get(0).replaceAll(" ", "").split(",");

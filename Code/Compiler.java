@@ -960,6 +960,7 @@ public class Compiler
         }
         else if (Objects.equals(currToken.tok, ","))
         {
+        	correctSql = false;
             CheckToken(",", currToken.tok);
             if(Objects.equals(currToken.type, "ID"))
             {
@@ -1048,6 +1049,7 @@ public class Compiler
         }
         else if (Objects.equals(currToken.tok, ","))
         {
+        	correctSql = false;
             CheckToken(",", currToken.tok);
             if(Objects.equals(currToken.type, "ID"))
             {
