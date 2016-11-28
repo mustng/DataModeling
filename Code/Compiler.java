@@ -136,8 +136,6 @@ public class Compiler
 
         boolean value = true;                                                               //Flag to execute a user interactive menu
 
-        System.out.println(stop);
-        
         while (value == true && stop == false)
         {
             value = menu();
@@ -848,8 +846,8 @@ public class Compiler
         {
             CheckToken("WHERE", currToken.tok);
             if(Objects.equals(currToken.type, "ID")) {
-                //CheckToken("ID", currToken.type);
-                idFound();
+                CheckToken("ID", currToken.type);
+                //idFound();
                 expression();
             }
             else
