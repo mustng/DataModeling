@@ -16,12 +16,7 @@ public class SQLTOXML {
 //		tableInfo.add("CITY");
 //		SELECT SNO, SNAME, QUOTA, CITY FROM S;
 		
-		String tryAgain[] = { 
-				"Run Another Query",
-				"Exit the Program"
-			};
-		
-		String yesOrNo[] = { 
+		String yesOrNo[] = {    //options
 				"Yes",
 				"No"
 			};
@@ -30,11 +25,14 @@ public class SQLTOXML {
 				"Create and View a DTD File",
 				"Create and View a XSD File",
 				"Create and View a XML File",
-				"Exit the Displayer"
+				"Run Another Query",
+				"Exit the Program"
 			};
 		
-		@SuppressWarnings("resource")
-		Scanner queryInput = new Scanner(System.in);
+		boolean runAnotherProgram = false;
+		
+//		@SuppressWarnings("resource")
+//		Scanner queryInput = new Scanner(System.in);
 		@SuppressWarnings("resource")
 		Scanner file = new Scanner(System.in);
 		
@@ -75,7 +73,7 @@ public class SQLTOXML {
 					System.out.println("No file will be written just displayed");
 				} 
 				
-				while(!currentInput.equals("Exit the Displayer")){
+				while(!currentInput.equals("Exit the Program")){
 					DisplayMenu(options);
 					currentInput = options[getData(options) - 1];
 					
@@ -88,11 +86,16 @@ public class SQLTOXML {
 					else if (currentInput.equals("Create and View a XML File")){
 						XMLMaker.XML(tableInfo);
 					}
-				
+					else if (currentInput.equals("Run Another Query")){
+						currentInput = "Exit the Program";
+						runAnotherProgram = true;
+					}
 				}
 			}
-			DisplayMenu(tryAgain);
-			currentInput = tryAgain[getData(tryAgain) - 1];
+			if (runAnotherProgram){
+				currentInput = "Not going to exit";
+				runAnotherProgram = false;
+			}
 			XMLMaker.resetFileName();
 			Compiler.reset();
 			Compiler.resetTableName();
