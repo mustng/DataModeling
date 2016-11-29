@@ -344,14 +344,18 @@ public static void XML(ArrayList<String> tableInfo ){
 		///add item after + to queue to see if contains later
 		for(int i = 0; i < tableInfo.size(); i++){
 			if(tableInfo.get(i).contains("+")){
-				arrayAfter.add(tableInfo.get(i + 1));   //get index after < to capture clean then grab the element before
+				arrayAfter.add(tableInfo.get(i - 1));   //get index after < to capture clean then grab the element before
 			}											//this way it can be added to the ORDER BY statement
 		}
+		
+		arrayAfter.add(0," ");
 		cleanArray(arrayAfter);
 		cleanArray(tableInfo);
-		arrayAfter.add(tableInfo.get(tableInfo.indexOf(arrayAfter.get(arrayAfter.size() - 1)) - 1));
-		query += " ORDER BY " + arrayAfter.get(arrayAfter.size() - 1);				//create ORDER BY Statement
 		
+		String temp = query ;
+		temp += " ORDER BY " + arrayAfter.get(1);				//create ORDER BY Statement
+		
+		System.out.println(temp);
 		
 		((ArrayList<String>)tableData.get(0)).add(tableInfo.get(0));
 		tableData.add(new ArrayList());
