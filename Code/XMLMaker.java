@@ -444,7 +444,7 @@ public static void XML(ArrayList<String> tableInfo ){
 		
 		((ArrayList<String>)tableData.get(0)).add(tableInfo.get(0));
 		tableData.add(new ArrayList());
-		
+		System.out.println("1" + query);
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             
@@ -453,9 +453,10 @@ public static void XML(ArrayList<String> tableInfo ){
             System.out.println("Could not load driver.");
         }
         Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
-        
+        System.out.println("2");
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(query);
+        System.out.println("4 " + tableInfo + "\n"); 
         int j = 1;
         while( res.next() ) {
         	for (int i = 1; i < tableInfo.size(); i++){
@@ -465,7 +466,7 @@ public static void XML(ArrayList<String> tableInfo ){
         	tableData.add(new ArrayList());
         	j++;
         }
-	      
+        System.out.println("5 " + tableInfo + "\n");  
         stmt.close();
         
 	      for(int m = 0; m < tableData.size();m++){
