@@ -257,7 +257,7 @@ public static void XML(ArrayList<String> tableInfo ){
 	        				printOut += xmlLines.get(k + 2).replace("~", "").replace("@", "") + "\n";
 	        				k = 0;
 	        			}
-	        			else if(tableData.get(i + 1).get(recordIndex).equals(tableData.get(i).get(recordIndex))){
+	        			else if(i + 1 > tableData.size() && tableData.get(i + 1).get(recordIndex).equals(tableData.get(i).get(recordIndex))){
 	        				j = recordIndex;
 	        				k = startKIndex;
 	        				i++;
@@ -344,7 +344,7 @@ public static void XML(ArrayList<String> tableInfo ){
 		///add item after + to queue to see if contains later
 		for(int i = 0; i < tableInfo.size(); i++){
 			if(tableInfo.get(i).contains("+")){
-				arrayAfter.add(tableInfo.get(i - 1));   //get index after < to capture clean then grab the element before
+				arrayAfter.add(tableInfo.get(i + 1));   //get index after < to capture clean then grab the element before
 			}											//this way it can be added to the ORDER BY statement
 		}
 		
@@ -352,8 +352,13 @@ public static void XML(ArrayList<String> tableInfo ){
 		cleanArray(arrayAfter);
 		cleanArray(tableInfo);
 		
+		System.out.println(arrayAfter);
+		System.out.println(tableInfo);
+		
+		int num = tableInfo.indexOf(arrayAfter.get(1));
+		
 		String temp = query ;
-		temp += " ORDER BY " + arrayAfter.get(1);				//create ORDER BY Statement
+		temp += " ORDER BY " + tableInfo.get(num - 1);				//create ORDER BY Statement
 		
 		System.out.println(temp);
 		
