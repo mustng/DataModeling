@@ -17,8 +17,10 @@ public class XMLMaker {
 		String printOut = "";
         String[] tables = input.get(0).replaceAll(" ", "").split(",");
         String dataType;
+		String t, tbl;
+		String[] ta;
 		
-		cleanArray(input);
+		cleanArray2(input);
 		
 		String temp2 = filename;
         printOut += "\n\n<?xml version = \"1.0\"?>\n";
@@ -29,9 +31,21 @@ public class XMLMaker {
             printOut += "<xsd:complexType name=\"" + tables[i] + "\">\n";
             for(int j = 1; j < input.size(); j++)
             {
-                dataType = getDataType(tables[i], input.get(j).replaceAll(" ", ""));
+				if (input.get(j).contains("."))
+				{
+					ta = input.get(j).replaceAll(" ", "").split(".");
+
+					tbl = ta[0];
+					t = ta[1];
+				}
+				else
+				{
+					t = input.get(j).replaceAll(" ", "");
+					tbl = tables[i];
+				}
+                dataType = getDataType(tbl, t);
                 if (dataType != null)
-                    printOut += "<xsd:element name=\"" + input.get(j) + "\" type=\"xsd:" + dataTypeConv(dataType) + " />\n";
+                    printOut += "<xsd:element name=\"" + t + "\" type=\"xsd:" + dataTypeConv(dataType) + " />\n";
                 dataType = null;
             }
             printOut += "</xsd:complexType >\n";
@@ -179,6 +193,27 @@ public static ArrayList<String> cleanArray(ArrayList<String> input){
 				input.set(i, splitWord[splitWord.length - 1]);
 			}
 			
+		}
+//		System.out.println(input);
+		return input;
+	}
+	public static ArrayList<String> cleanArray2(ArrayList<String> input){
+
+		for(int i = 1; i < input.size(); i++){
+
+			if(input.get(i).contains("<") || input.get(i).contains(">")){
+
+				input.remove(i);
+				i--;
+
+			}
+			else if (input.get(i).toUpperCase().contains("AS")){
+				input.remove(i + 1);
+				i--;
+				input.remove(i + 1);
+				i--;
+			}
+
 		}
 //		System.out.println(input);
 		return input;
