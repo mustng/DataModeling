@@ -35,6 +35,7 @@ public class Compiler
 	private static ArrayList<String> tagNames = new ArrayList<String>();
 	private static ArrayList<String> taggedAttributes = new ArrayList<String>();
 	private static String lineEntered  = "";
+	private static String tablesEntered  = "";
 	private static boolean stop = false;
 	private static boolean dotSpacer = true;
 	private static boolean correctSql = true;
@@ -203,6 +204,7 @@ public class Compiler
         //taggedAttributes.clear();
 //        finalList.clear();
         lineEntered = "";
+        tablesEntered = "";
         dotSpacer = true;
     }
 
@@ -366,6 +368,10 @@ public class Compiler
             lineEntered += " "+wholeData;
         }
     }
+    
+    public static void sqlTableNames(String tableData){        
+    	tablesEntered += tableData;    
+    }
 
     public static void CheckToken(String expected, String current)                                                      //Function to check whether the current token is correct
     {
@@ -412,6 +418,7 @@ public class Compiler
 
             tableNames.addAll(originalList);
             tableNames.add(0, lineEntered);
+            tableNames.add(1, tablesEntered);
 //            System.out.println(tableNames);
             //for(String thing : originalList)
                 //System.out.print(thing);
@@ -778,12 +785,14 @@ public class Compiler
             //CheckToken("FROM", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
                 tableNames.add(tokenList.get(index).tok);
+                sqlTableNames(tokenList.get(index).tok);
                 CheckToken("ID", currToken.type);
                 if(Objects.equals(currToken.tok, "WHERE")){
                     wSelectCommand3();
                 }
                 else if(Objects.equals(currToken.tok, ","))
                 {
+                	sqlTableNames(",");
                     CheckToken(",", currToken.tok);
                     fromKeyWord();
                 }

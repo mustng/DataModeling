@@ -9,11 +9,11 @@ public class SQLTOXML {
 	
 	public static void main(String args[]) {
 		
-		tableInfo.add("S , C"); 
-		tableInfo.add("S . SNO");
-		tableInfo.add("ID");
-		tableInfo.add("QUOTA");
-		tableInfo.add("CITY");
+//		tableInfo.add("S , C"); 
+//		tableInfo.add("S . SNO");
+//		tableInfo.add("ID");
+//		tableInfo.add("QUOTA");
+//		tableInfo.add("CITY");
 //		SELECT SNO, SNAME, QUOTA, CITY FROM S;
 //		SELECT DISTINCT s.sname as Salesperson_Name, orders.cno as Customer_No, orders.totqty FROM s, orders WHERE s.sno = orders.sno
 		
