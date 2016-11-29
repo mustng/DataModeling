@@ -419,7 +419,7 @@ public class Compiler
             tableNames.addAll(originalList);
             tableNames.add(0, lineEntered);
             tableNames.add(1, tablesEntered);
-//            System.out.println(tableNames);
+            System.out.println(tableNames);
             //for(String thing : originalList)
                 //System.out.print(thing);
             //semantics();
@@ -653,7 +653,14 @@ public class Compiler
         expression();                                                                   //expression
         if (Objects.equals(currToken.tok, ","))
         {
+            if((tokenList.get(index+1).tok != "FROM")|| (tokenList.get(index+1).tok != ">")){
+                lineEntered += " "+",";
+                //correctSql = false;
+            }
+            correctSql = false;
+
             CheckToken(",", currToken.tok);
+            correctSql = true;
             updateCommand2();
         }
         else
@@ -693,7 +700,7 @@ public class Compiler
         expression();
         if (Objects.equals(currToken.tok, ","))
         {
-            CheckToken(",", currToken.tok);
+            //CheckToken(",", currToken.tok);
             wUpdateCommand2();
         }
         else
@@ -792,7 +799,15 @@ public class Compiler
                 else if(Objects.equals(currToken.tok, ","))
                 {
                 	sqlTableNames(",");
+
+                    if((tokenList.get(index+1).tok != "FROM")|| (tokenList.get(index+1).tok != ">")){
+                        lineEntered += " "+",";
+                        //correctSql = false;
+                    }
+                    correctSql = false;
+
                     CheckToken(",", currToken.tok);
+                    correctSql = true;
                     fromKeyWord();
                 }
                 else if(Objects.equals(currToken.tok, ";"))
@@ -879,8 +894,8 @@ public class Compiler
         fieldType();
         if (Objects.equals(currToken.tok, ","))
         {
-
-            CheckToken(",", currToken.tok);
+            //correctSql = true;
+            //CheckToken(",", currToken.tok);
             fieldDefList();
         }
     }
@@ -897,7 +912,7 @@ public class Compiler
                 CheckToken("NUM", currToken.type);
                 if (Objects.equals(currToken.tok, ","))
                 {
-                    CheckToken(",", currToken.tok);
+                    //CheckToken(",", currToken.tok);
                     CheckToken("NUM", currToken.type);
                 }
                 CheckToken(")", currToken.tok);
@@ -968,8 +983,18 @@ public class Compiler
         }
         else if (Objects.equals(currToken.tok, ","))
         {
-        	correctSql = false;
+
+
+        	//correctSql = true;
+            int tempNum = index + 1;
+            if((Objects.equals((tokenList.get(tempNum).tok), "<"))){
+                //lineEntered += " "+",";
+                correctSql = false;
+                System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
+            }
+
             CheckToken(",", currToken.tok);
+            correctSql = true;
             if(Objects.equals(currToken.type, "ID"))
             {
                 idFound();
@@ -1057,8 +1082,23 @@ public class Compiler
         }
         else if (Objects.equals(currToken.tok, ","))
         {
-        	correctSql = false;
+
+
+//            if((Objects.equals((tokenList.get(index+1).tok), "FROM"))){
+//                correctSql = false;
+//            }else{
+//                correctSql = true;
+//            }
+            int tempNum = index + 1;
+            if((Objects.equals((tokenList.get(tempNum).tok), "FROM"))|| (Objects.equals((tokenList.get(tempNum).tok), ">"))){
+                //lineEntered += " "+",";
+                correctSql = false;
+                System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
+            }
+
             CheckToken(",", currToken.tok);
+            correctSql = true;
+
             if(Objects.equals(currToken.type, "ID"))
             {
                 /*
@@ -1108,7 +1148,20 @@ public class Compiler
             correctSql = false;
             CheckToken(">", currToken.tok);
             if(Objects.equals(currToken.tok, ",")){
+//                if((Objects.equals((tokenList.get(index+1).tok), "FROM"))){
+//                    correctSql = false;
+//                }else{
+//                    correctSql = true;
+//                }
+                int tempNum = index + 1;
+                if((Objects.equals((tokenList.get(tempNum).tok), "FROM"))|| (Objects.equals((tokenList.get(tempNum).tok), ">"))){
+                    //lineEntered += " "+",";
+                    correctSql = false;
+                    System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
+                }
+
                 CheckToken(",", currToken.tok);
+                correctSql = true;
                 if(Objects.equals(currToken.tok, "FROM")){
                     correctSql = true;
                     CheckToken("FROM", currToken.tok);
@@ -1143,6 +1196,7 @@ public class Compiler
             else if(Objects.equals(currToken.tok, "+")){
                 sqlStatement(tokenList.get(index-1).tok+" "+tokenList.get(index).tok+""+tokenList.get(index+1).tok);//CompName
                 CheckToken("+", currToken.tok);
+                tagNames.add(tokenList.get(index).tok);
                 definitionThree_tag();
             }
             else
@@ -1162,8 +1216,13 @@ public class Compiler
         	correctSql = false;
             CheckToken("ID", currToken.type);
             if(Objects.equals(currToken.tok, ",")){
-            	correctSql = true;
+                if((tokenList.get(index+1).tok != "FROM")|| (tokenList.get(index+1).tok != ">")){
+                    lineEntered += " "+",";
+                    //correctSql = false;
+                }
+                correctSql = false;
                 CheckToken(",", currToken.tok);
+                correctSql = true;
                 if(Objects.equals(currToken.type, "ID")){
                     idFound();
                     //CheckToken("ID", currToken.type);
@@ -1231,7 +1290,7 @@ public class Compiler
         }
         if (Objects.equals(currToken.tok, ","))
         {
-            CheckToken(",", currToken.tok);
+            //CheckToken(",", currToken.tok);
             literal();
         }
     }
