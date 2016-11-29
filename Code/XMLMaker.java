@@ -481,6 +481,7 @@ public static void XML(ArrayList<String> tableInfo ){
 	
 	public static ArrayList<String> getAttributes(ArrayList<String> table)
 	{
+		table.remove(table.indexOf("*"));
 		String[] tbls = table.get(0).replaceAll(" ", "").split(",");
 		try
 		{
@@ -502,7 +503,7 @@ public static void XML(ArrayList<String> tableInfo ){
 			}
 			stmt.close();
 
-			table.remove(table.indexOf("*"));
+
 			return table;
 		}
 		catch (SQLException f)
