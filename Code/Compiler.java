@@ -385,7 +385,7 @@ public class Compiler
 
             index++;
             currToken = tokenList.get(index);
-            System.out.println(current);
+//            System.out.println(current);
 
 
         }
@@ -420,7 +420,7 @@ public class Compiler
             tableNames.addAll(originalList);
             tableNames.add(0, lineEntered);
             tableNames.add(1, tablesEntered);
-            System.out.println(tableNames);
+//            System.out.println(tableNames);
             //for(String thing : originalList)
                 //System.out.print(thing);
             //semantics();
@@ -1094,7 +1094,7 @@ public class Compiler
             if((Objects.equals((tokenList.get(tempNum).tok), "FROM"))|| (Objects.equals((tokenList.get(tempNum).tok), ">"))){
                 //lineEntered += " "+",";
                 correctSql = false;
-                System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
+//                System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
             }
 
             CheckToken(",", currToken.tok);

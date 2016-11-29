@@ -64,7 +64,7 @@ public class SQLTOXML {
 				query = tableInfo.get(0).replace(";", ""); 
 				tableInfo.remove(0);
 				
-				System.out.println(query + "\n" + tableInfo + "\n" + tableInfo.get(0));
+//				System.out.println(query + "\n" + tableInfo + "\n" + tableInfo.get(0));
 				XMLMaker.setQuery(query);
 				if (tableInfo.contains("*"))
 					tableInfo = XMLMaker.getAttributes(tableInfo);

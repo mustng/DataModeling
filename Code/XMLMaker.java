@@ -228,7 +228,7 @@ public static void XML(ArrayList<String> tableInfo ){
 	boolean recordIndexHit = true;
 	int k = 0;  //index of the XMLLines array
 	
-	System.out.println(xmlLines);
+//	System.out.println(xmlLines);
 
 	   for(int i = 1; i < tableData.size();i++){
 		   
@@ -352,15 +352,15 @@ public static void XML(ArrayList<String> tableInfo ){
 		cleanArray(arrayAfter);
 		cleanArray(tableInfo);
 		
-		System.out.println(arrayAfter);
-		System.out.println(tableInfo);
+//		System.out.println(arrayAfter);
+//		System.out.println(tableInfo);
 		
 		int num = tableInfo.indexOf(arrayAfter.get(1));
 		
 		String temp = query ;
 		temp += " ORDER BY " + tableInfo.get(num - 1);				//create ORDER BY Statement
 		
-		System.out.println(temp);
+//		System.out.println(temp);
 		
 		((ArrayList<String>)tableData.get(0)).add(tableInfo.get(0));
 		tableData.add(new ArrayList());
@@ -459,7 +459,6 @@ public static void XML(ArrayList<String> tableInfo ){
 		
 		((ArrayList<String>)tableData.get(0)).add(tableInfo.get(0));
 		tableData.add(new ArrayList());
-		System.out.println("1" + query);
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             
@@ -468,10 +467,8 @@ public static void XML(ArrayList<String> tableInfo ){
             System.out.println("Could not load driver.");
         }
         Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
-        System.out.println("2");
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(query);
-        System.out.println("4 " + tableInfo + "\n"); 
         int j = 1;
         while( res.next() ) {
         	for (int i = 1; i < tableInfo.size(); i++){
@@ -481,15 +478,14 @@ public static void XML(ArrayList<String> tableInfo ){
         	tableData.add(new ArrayList());
         	j++;
         }
-        System.out.println("5 " + tableInfo + "\n");  
         stmt.close();
         
-	      for(int m = 0; m < tableData.size();m++){
-	          for(int n = 0; n < ((ArrayList)tableData.get(m)).size(); n++){
-	             System.out.print( (String)((ArrayList)tableData.get(m)).get(n) +"  ");
-	          }
-	          System.out.println();
-	       }
+//	      for(int m = 0; m < tableData.size();m++){
+//	          for(int n = 0; n < ((ArrayList)tableData.get(m)).size(); n++){
+//	             System.out.print( (String)((ArrayList)tableData.get(m)).get(n) +"  ");
+//	          }
+//	          System.out.println();
+//	       }
         
         return tableData;
     }
