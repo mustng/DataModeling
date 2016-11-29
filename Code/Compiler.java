@@ -770,7 +770,6 @@ public class Compiler
             else if(!Objects.equals(tokenList.get(index+1).tok, ".") && !Objects.equals(tokenList.get(index-1).tok, ".")) {
                 sqlStatement(tokenList.get(index).tok);
             }
-
             CheckToken("ID", currToken.type);
             //fieldList();
             //CheckToken("FROM", currToken.tok);
@@ -1163,6 +1162,7 @@ public class Compiler
         	correctSql = false;
             CheckToken("ID", currToken.type);
             if(Objects.equals(currToken.tok, ",")){
+            	correctSql = true;
                 CheckToken(",", currToken.tok);
                 if(Objects.equals(currToken.type, "ID")){
                     idFound();
