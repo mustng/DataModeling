@@ -113,6 +113,8 @@ public class XMLMaker {
 		
 		
 		cleanArray(tableInfo);
+
+
 		dtdSideBar(dtdLines,tableInfo);	 //Creates side bar
 		for (int i  = 0; i < dtdLines.size(); i++){
 			printOut += dtdLines.get(i) + "\n";
@@ -126,6 +128,9 @@ public class XMLMaker {
 	
 	
 	public static ArrayList<String> dtdSideBar(ArrayList<String> dtdLines, ArrayList<String> tableInfo){
+
+		String[] tables = tableInfo.get(0).replaceAll(" ", "").split(",");
+
 		dtdLines.add("<?xml ve rsion=\"1.0\"?>\n");
 		dtdLines.add("<!DOCTYPE " + tableInfo.get(0) + " [");
 		dtdLines.add("<!ELEMENT " + tableInfo.get(0) + "(");
@@ -147,13 +152,13 @@ public class XMLMaker {
 	
 public static ArrayList<String> cleanArray(ArrayList<String> input){
 		
-		if (input.get(0).contains(",")){						//check for the main table
+		/*if (input.get(0).contains(",")){						//check for the main table
 			
 			String[] splitTableName = input.get(0).split(",");
-			input.set(0, splitTableName[0].replace(" ", ""));
+			input.set(0, splitTableName[0].replace(" ", ""));*/
 			
 	
-		}
+		//}
 		for(int i = 1; i < input.size(); i++){
 			
 			if(input.get(i).contains("<") || input.get(i).contains(">")){
@@ -190,10 +195,10 @@ public static void XML(ArrayList<String> tableInfo ){
 	
 	tableData.add(new ArrayList());   //must have for it to load array
 	
-	if (tableInfo.get(0).contains(",")){						//check for the main table
+	/*if (tableInfo.get(0).contains(",")){						//check for the main table
 		String[] splitTableName = tableInfo.get(0).split(",");
 		tableInfo.set(0, splitTableName[0].replace(" ", ""));
-	}
+	}*/
 
 	xmlLines(xmlLines , tableInfo);
 	for(int i = 0; i < tableInfo.size(); i++){
@@ -380,12 +385,13 @@ public static void XML(ArrayList<String> tableInfo ){
 	public static ArrayList<String> xmlLines (ArrayList<String> xmlLines, ArrayList<String> tableInfo){  //This creates the lines going into the code 
 																										// example <ID   table="Animals" name="ID"> and </ID>
 		int tagNameDepthCount = 1;
+		String[] tables = tableInfo.get(0).replaceAll(" ", "").split(",");
 		
 		for (int i = 0; i < tableInfo.size() ; i++){	
 			
 			if(i == 0){
-				xmlLines.add("<" + tableInfo.get(0) + ">");
-				xmlLines.add("</" + tableInfo.get(0) + ">");
+				xmlLines.add("<" + tables[0] + ">");
+				xmlLines.add("</" + tables[0] + ">");
 			}
 			else if(i != tableInfo.size() - 1 && tableInfo.get(i + 1).toUpperCase().contains("AS")){
 				String[] leftOfAS = new String[10];
@@ -402,7 +408,7 @@ public static void XML(ArrayList<String> tableInfo ){
 				else{
 					rightOfAs[1] = tableInfo.get(i + 2);;
 				}
-				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + rightOfAs[1].replace(" ", "") + "   table=\"" + tableInfo.get(0) + "\" name=\"" + leftOfAS[1].replace(" ", "") + "\">");
+				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + rightOfAs[1].replace(" ", "") + "   table=\"" + tables[0] + "\" name=\"" + leftOfAS[1].replace(" ", "") + "\">");
 				xmlLines.add("</" + rightOfAs[1].replace(" ", "") + ">");
 				i+=2;
 			}
@@ -420,7 +426,7 @@ public static void XML(ArrayList<String> tableInfo ){
 				xmlLines.add("</" + table[1] + ">");
 			}
 			else{
-				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + tableInfo.get(i) + "   table=\"" + tableInfo.get(0) + "\" name=\"" + tableInfo.get(i) + "\">");
+				xmlLines.add(tabMaker(tagNameDepthCount) + "<" + tableInfo.get(i) + "   table=\"" + tables[0] + "\" name=\"" + tableInfo.get(i) + "\">");
 				xmlLines.add("</" + tableInfo.get(i) + ">");
 			}
 			
