@@ -1,6 +1,6 @@
 Group Meetings 
 ========
-11/14/16 - Durtation: 1 hour
+11/14/16 - Duration: 1 hour
 Purpose: Setup Github/Slack/SourceTree.
 
 Members present: 
@@ -11,7 +11,7 @@ Members present:
 - Logan McManus
 
 ========
-11/18/16 - Durtation: 2+ hours
+11/18/16 - Duration: 2+ hours
 Purpose: Worked on definitions, setup database jdbc connections/tables/queries.
 
 Members present:
@@ -22,8 +22,8 @@ Members present:
 - Logan McManus
 
 ========
-11/21/16 - Durtation: 1 hour
-Purpose: Went over project plan. Met with Dr. Abbassi about conecepts the group did not understand
+11/21/16 - Duration: 1 hour
+Purpose: Went over project plan. Met with Dr. Abbassi about concepts the group did not understand
 
 Members present:
 - Samuel Gost
@@ -31,7 +31,7 @@ Members present:
 - Logan McManus
 
 ========
-11/22/16 - Durtation: 2+ hours
+11/22/16 - Duration: 2+ hours
 Purpose: Continue progress of non complete pieces and run over more rules
 - Justin Gelalia
 - Samuel Gost
@@ -39,13 +39,13 @@ Purpose: Continue progress of non complete pieces and run over more rules
 - Logan McManus
 
 ========
-11/23/16 - Durtation: 2+ hours
+11/23/16 - Duration: 2+ hours
 Purpose: Work on what it would take to combine all the prototypes together
 - Samuel Gost
 - David Hughes
 
 ========
-11/26/16 - Durtation: 2+ hours
+11/26/16 - Duration: 2+ hours
 
 Purpose: Work on areas that do not work and bring more of the entire project together.
 
@@ -53,3 +53,14 @@ Members present:
 - Samuel Gost
 - David Hughes
 - Logan McManus
+
+========
+11/28/16 - Duration: 2+ hours
+
+Purpose: Last minute bug fixes and finalize project for turn in.
+
+Members present:
+- Samuel Gost
+- David Hughes
+- Logan McManus
+- Justin Gelalia
