@@ -104,6 +104,7 @@ public class Compiler
         keyWord.add("NUMBER");
         keyWord.add("INTEGER");
         keyWord.add("AS");
+        keyWord.add("AND");
 
         operator.add("<>");
         operator.add(">");
@@ -987,11 +988,11 @@ public class Compiler
 
         	//correctSql = true;
             int tempNum = index + 1;
-            if((Objects.equals((tokenList.get(tempNum).tok), "<"))){
-                //lineEntered += " "+",";
-                correctSql = false;
-                System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
-            }
+//            if((Objects.equals((tokenList.get(tempNum).tok), "<"))){
+//                //lineEntered += " "+",";
+//                correctSql = false;
+//                System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
+//            }
 
             CheckToken(",", currToken.tok);
             correctSql = true;
@@ -1157,7 +1158,7 @@ public class Compiler
                 if((Objects.equals((tokenList.get(tempNum).tok), "FROM"))|| (Objects.equals((tokenList.get(tempNum).tok), ">"))){
                     //lineEntered += " "+",";
                     correctSql = false;
-                    System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
+                    //System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
                 }
 
                 CheckToken(",", currToken.tok);
@@ -1216,10 +1217,18 @@ public class Compiler
         	correctSql = false;
             CheckToken("ID", currToken.type);
             if(Objects.equals(currToken.tok, ",")){
-                if((tokenList.get(index+1).tok != "FROM")|| (tokenList.get(index+1).tok != ">")){
-                    lineEntered += " "+",";
-                    //correctSql = false;
-                }
+//                if((tokenList.get(index+1).tok != "FROM")|| (tokenList.get(index+1).tok != ">")){
+//                    lineEntered += " "+",";
+//                    //correctSql = false;
+//                }
+//                correctSql = false;
+//                int tempNum = index + 1;
+//                if((Objects.equals((tokenList.get(tempNum).tok), "<"))){
+//                    //lineEntered += " "+",";
+//                    correctSql = false;
+//
+//                }
+                //System.out.println("yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab!");
                 correctSql = false;
                 CheckToken(",", currToken.tok);
                 correctSql = true;
@@ -1458,22 +1467,44 @@ public class Compiler
         else if(Objects.equals(currToken.type, "NUM")) {
             CheckToken("NUM", currToken.type);
             if (Objects.equals(currToken.tok, "AND")){
-                andContinuation();
+                //andContinuation();
+                multiAnd();
             }
-            else if(Objects.equals(currToken.tok, ";")){
-
-            }
-            else{
-                System.out.print("Error #8a: missing the AND keyword or the semicolon!");
-                failed("The right token", currToken.tok);
-            }
+//            else if(Objects.equals(currToken.tok, ";")){
+//
+//            }
+//            else{
+//                System.out.print("Error #8a: missing the AND keyword or the semicolon!");
+//                failed("The right token", currToken.tok);
+//            }
         }
         else if(Objects.equals(currToken.type, "ID")){
             CheckToken("ID", currToken.type);
+            if (Objects.equals(currToken.tok, "AND")){
+                //andContinuation();
+                multiAnd();
+            }
             dotAttribute();
+            if (Objects.equals(currToken.tok, "AND")){
+                //andContinuation();
+                multiAnd();
+            }
         }
         else {
             System.out.print("Error #9a: next token should be a String, a number or another attribute!");
+            failed("The right token", currToken.tok);
+        }
+    }
+
+    public static void multiAnd(){
+        if (Objects.equals(currToken.tok, "AND")){
+            andContinuation();
+        }
+        else if(Objects.equals(currToken.tok, ";")){
+
+        }
+        else{
+            System.out.print("Error #8a: missing the AND keyword or the semicolon!");
             failed("The right token", currToken.tok);
         }
     }
