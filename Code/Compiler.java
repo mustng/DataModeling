@@ -784,7 +784,7 @@ public class Compiler
         //{
             //CheckToken("FROM", currToken.tok);
             if(Objects.equals(currToken.type, "ID")){
-                tableNames.add(tokenList.get(index).tok);
+//                tableNames.add(tokenList.get(index).tok);
                 sqlTableNames(tokenList.get(index).tok);
                 CheckToken("ID", currToken.type);
                 if(Objects.equals(currToken.tok, "WHERE")){
@@ -1160,6 +1160,7 @@ public class Compiler
     public static void definitionThree_tag(){
         if(Objects.equals(currToken.type, "ID")){
             //TaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaagNames!
+        	correctSql = false;
             CheckToken("ID", currToken.type);
             if(Objects.equals(currToken.tok, ",")){
                 CheckToken(",", currToken.tok);
