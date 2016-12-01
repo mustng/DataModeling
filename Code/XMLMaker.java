@@ -230,10 +230,10 @@ public static void XML(ArrayList<String> tableInfo ){
 	
 	tableData.add(new ArrayList());   //must have for it to load array
 	
-	/*if (tableInfo.get(0).contains(",")){						//check for the main table
-		String[] splitTableName = tableInfo.get(0).split(",");
-		tableInfo.set(0, splitTableName[0].replace(" ", ""));
-	}*/
+//	if (tableInfo.get(0).contains(",")){						//check for the main table
+//		String[] splitTableName = tableInfo.get(0).split(",");
+//		tableInfo.set(0, splitTableName[0].replace(" ", ""));
+//	}
 
 	xmlLines(xmlLines , tableInfo);
 	for(int i = 0; i < tableInfo.size(); i++){
@@ -245,6 +245,7 @@ public static void XML(ArrayList<String> tableInfo ){
 	try {
 		if(doesItContainAPlus){
 			sortAndRunQuery(tableData, tableInfo, query); //when doing query uses ORDER BY to organize the items
+//			runQuery(tableData, tableInfo); //fetch sql query
 		}
 		else{
 			runQuery(tableData, tableInfo); //fetch sql query
@@ -286,13 +287,13 @@ public static void XML(ArrayList<String> tableInfo ){
 //	        		System.out.println(xmlLines.get(k) + ((ArrayList)tableData.get(i)).get(j) + xmlLines.get(k + 1));
 	        		printOut += xmlLines.get(k) + ((ArrayList<?>)tableData.get(i)).get(j) + xmlLines.get(k + 1) + "\n";
 	        		
-	        		if(k  + 2 <xmlLines.size() && xmlLines.get(k + 2).contains("~")){
+	        		if(k  + 2 < xmlLines.size() && xmlLines.get(k + 2).contains("~")){
 	        			if( i + 2 > tableData.size()){
 //	        				System.out.println(xmlLines.get(k + 2).replace("~", "").replace("@", ""));
 	        				printOut += xmlLines.get(k + 2).replace("~", "").replace("@", "") + "\n";
 	        				k = 0;
 	        			}
-	        			else if(i + 1 > tableData.size() && tableData.get(i + 1).get(recordIndex).equals(tableData.get(i).get(recordIndex))){
+	        			else if(i + 2 < tableData.size() && tableData.get(i + 1).get(recordIndex).equals(tableData.get(i).get(recordIndex))){
 	        				j = recordIndex;
 	        				k = startKIndex;
 	        				i++;
@@ -410,7 +411,7 @@ public static void XML(ArrayList<String> tableInfo ){
         Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@olympia.unfcsd.unf.edu:1521:dworcl", "team3", "unfpdm");
         
         Statement stmt = conn.createStatement();
-        ResultSet res = stmt.executeQuery(query);
+        ResultSet res = stmt.executeQuery(temp);
         int j = 1;
         while( res.next() ) {
         	for (int i = 1; i < tableInfo.size(); i++){
@@ -565,31 +566,46 @@ public static void XML(ArrayList<String> tableInfo ){
 //		
 //		tableData.add(new ArrayList());
 //	      
-//	      ((ArrayList<String>)tableData.get(1)).add("S1");
-//	      ((ArrayList<String>)tableData.get(1)).add("Adams");
-//	      ((ArrayList<String>)tableData.get(1)).add("3000");
-//	      ((ArrayList<String>)tableData.get(1)).add("Dallas");
+//		((ArrayList<String>)tableData.get(1)).add("Adams");
+//	      ((ArrayList<String>)tableData.get(1)).add("C1");
+//	      ((ArrayList<String>)tableData.get(1)).add("1");
 //	      tableData.add(new ArrayList());
-//	      ((ArrayList<String>)tableData.get(2)).add("S2");
-//	      ((ArrayList<String>)tableData.get(2)).add("Smith");
-//	      ((ArrayList<String>)tableData.get(2)).add("10000");
-//	      ((ArrayList<String>)tableData.get(2)).add("Chicago");
+//	      ((ArrayList<String>)tableData.get(2)).add("Adams");
+//	      ((ArrayList<String>)tableData.get(2)).add("C5");
+//	      ((ArrayList<String>)tableData.get(2)).add("2");
 //	      tableData.add(new ArrayList());
-//	      ((ArrayList<String>)tableData.get(3)).add("S3");
-//	      ((ArrayList<String>)tableData.get(3)).add("Jones");
-//	      ((ArrayList<String>)tableData.get(3)).add("7500");
-//	      ((ArrayList<String>)tableData.get(3)).add("Phoenix");
+//	      ((ArrayList<String>)tableData.get(3)).add("Adams");
+//	      ((ArrayList<String>)tableData.get(3)).add("C5");
+//	      ((ArrayList<String>)tableData.get(3)).add("4");
 //	      tableData.add(new ArrayList());
-//	      ((ArrayList<String>)tableData.get(4)).add("S4");
-//	      ((ArrayList<String>)tableData.get(4)).add("Knapp");
-//	      ((ArrayList<String>)tableData.get(4)).add("13000");
-//	      ((ArrayList<String>)tableData.get(4)).add("San Diego");
+//	      ((ArrayList<String>)tableData.get(4)).add("Jones");
+//	      ((ArrayList<String>)tableData.get(4)).add("C5");
+//	      ((ArrayList<String>)tableData.get(4)).add("6");
 //	      tableData.add(new ArrayList());
-//	      ((ArrayList<String>)tableData.get(5)).add("S5");
-//	      ((ArrayList<String>)tableData.get(5)).add("Martin");
-//	      ((ArrayList<String>)tableData.get(5)).add("25000");
-//	      ((ArrayList<String>)tableData.get(5)).add("New York");
-//	      ((ArrayList<String>)tableData.get(5)).add("New York");
+//	      ((ArrayList<String>)tableData.get(5)).add("Jones");
+//	      ((ArrayList<String>)tableData.get(5)).add("C3");
+//	      ((ArrayList<String>)tableData.get(5)).add("5");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(6)).add("Jones");
+//	      ((ArrayList<String>)tableData.get(6)).add("C8");
+//	      ((ArrayList<String>)tableData.get(6)).add("4");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(7)).add("Martin");
+//	      ((ArrayList<String>)tableData.get(7)).add("C8");
+//	      ((ArrayList<String>)tableData.get(7)).add("2");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(8)).add("Martin");
+//	      ((ArrayList<String>)tableData.get(8)).add("C1");
+//	      ((ArrayList<String>)tableData.get(8)).add("3");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(9)).add("Martin");
+//	      ((ArrayList<String>)tableData.get(9)).add("C4");
+//	      ((ArrayList<String>)tableData.get(9)).add("5");
+//	      tableData.add(new ArrayList());
+//	      ((ArrayList<String>)tableData.get(10)).add("Smith");
+//	      ((ArrayList<String>)tableData.get(10)).add("C2");
+//	      ((ArrayList<String>)tableData.get(10)).add("3");
+//	      tableData.add(new ArrayList());
 //	      
 ////	      for(int i = 0; i < tableData.size();i++){
 ////	          for(int j = 0; j < ((ArrayList)tableData.get(i)).size(); j++){
